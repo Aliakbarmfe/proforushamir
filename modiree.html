@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پنل مدیریت</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
+    body { background-color: #f0f2f5; color: #333; padding-bottom: 80px; }
+
+    /* هدر مدیریت */
+    header {
+      background: #343a40;
+      color: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .btn-header {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-header.info { background: #17a2b8; }
+    .btn-header.add { background: #28a745; font-size: 1.2rem; padding: 4px 12px; }
+
+    /* لیست محصولات */
+    .container { padding: 20px; max-width: 800px; margin: 0 auto; }
+    .product-item {
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .product-item img { width: 70px; height: 70px; border-radius: 6px; object-fit: cover; }
+    .product-details { flex-grow: 1; }
+    .product-title { font-weight: bold; font-size: 0.95rem; }
+    .product-price { color: #28a745; font-size: 0.85rem; margin-top: 4px; }
+    .actions { display: flex; gap: 8px; }
+    .btn-sm {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: #fff;
+    }
+    .btn-edit { background: #ffc107; color: #000; }
+    .btn-del { background: #dc3545; }
+
+    /* منوی شناور پایین */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #fff;
+      border-top: 1px solid #ccc;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 5px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+      z-index: 100;
+    }
+    .bottom-bar button {
+      flex: 1;
+      margin: 0 4px;
+      padding: 10px 5px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: #fff;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* پاپ آپ‌ها */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 15px;
+    }
+    .modal {
+      background: #fff;
+      width: 100%;
+      max-width: 450px;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal h3 { margin-bottom: 15px; text-align: center; color: #333; }
+    .modal input, .modal textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .modal label { font-size: 0.8rem; color: #666; margin-bottom: 4px; display: block; }
+    .modal-btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    .close-modal {
+      position: absolute;
+      top: 10px; left: 10px;
+      border: none; background: none;
+      font-size: 1.2rem; cursor: pointer;
+    }
+
+    .list-item {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      border: 1px solid #e9ecef;
+    }
+    
+    .chat-box {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      background: #fdfdfd;
+    }
+    .msg { margin-bottom: 8px; padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; max-width: 80%; }
+    .msg.user { background: #e2e3e5; align-self: flex-start; }
+    .msg.admin { background: #d4edda; margin-right: auto; text-align: left; }
+    .msg img { max-width: 100%; border-radius: 4px; margin-top: 5px; display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- هدر پنل مدیریت -->
+  <header>
+    <button class="btn-header" onclick="logoutAdmin()">خروج</button>
+    <button class="btn-header info" onclick="openAdminInfoModal()">اطلاعات مدیر</button>
+    <button class="btn-header add" onclick="openAddProductModal()">+</button>
+  </header>
+
+  <!-- لیست محصولات -->
+  <div class="container">
+    <h3 style="margin-bottom: 15px;">مدیریت محصولات</h3>
+    <div id="adminProductsList">در حال بارگذاری...</div>
+  </div>
+
+  <!-- منوی شناور پایین -->
+  <div class="bottom-bar">
+    <button onclick="openPublicNoticeModal()">ارسال اعلان عمومی</button>
+    <button onclick="openMessagesModal()">پیام کاربران</button>
+    <button onclick="openUsersModal()">کاربران</button>
+  </div>
+
+  <!-- پاپ آپ تغییر اطلاعات مدیر -->
+  <div class="modal-overlay" id="adminInfoModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('adminInfoModal')">✕</button>
+      <h3>تغییر اطلاعات مدیر</h3>
+      <input type="text" id="newAdminUser" placeholder="نام کاربری جدید">
+      <input type="password" id="newAdminPass" placeholder="رمز عبور جدید">
+      <button class="modal-btn" onclick="saveAdminInfo()">ذخیره تغییرات</button>
+    </div>
+  </div>
+
+  <!-- پاپ آپ افزودن/ویرایش محصول -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('productModal')">✕</button>
+      <h3 id="productModalTitle">افزودن محصول</h3>
+      <input type="hidden" id="editProductId">
+      <input type="text" id="pTitle" placeholder="نام محصول">
+      <input type="number" id="pPrice" placeholder="قیمت محصول (تومان)">
+      
+      <label>عکس اصلی محصول:</label>
+      <input type="file" id="pMainImgFile" accept="image/*">
+      
+      <label>عکس‌های اضافی محصول (چندتایی):</label>
+      <input type="file" id="pExtraImgFiles" accept="image/*" multiple>
+
+      <textarea id="pDesc" placeholder="توضیحات اضافی"></textarea>
+      <input type="text" id="pCardNum" placeholder="شماره کارت">
+      <input type="text" id="pCardName" placeholder="نام صاحب کارت">
+      <input type="text" id="pRubika" placeholder="آیدی روبیکای صاحب محصول">
+      
+      <button class="modal-btn" id="saveProductBtn" onclick="saveProduct()">ثبت محصول</button>
+    </div>
+  </div>
+
+  <!-- پاپ آپ ارسال اعلان عمومی -->
+  <div class="modal-overlay" id="publicNoticeModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('publicNoticeModal')">✕</button>
+      <h3>ارسال اعلان عمومی</h3>
+      <textarea id="publicNoticeText" placeholder="متن اعلان عمومی برای همه کاربران..."></textarea>
+      <button class="modal-btn" onclick="sendPublicNotice()">ارسال همگانی</button>
+    </div>
+  </div>
+
+  <!-- پاپ آپ لیست کاربران -->
+  <div class="modal-overlay" id="usersModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('usersModal')">✕</button>
+      <h3>لیست کاربران</h3>
+      <div id="usersListContainer">در حال بارگذاری...</div>
+    </div>
+  </div>
+
+  <!-- پاپ آپ ارسال اعلان شخصی -->
+  <div class="modal-overlay" id="privateNoticeModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('privateNoticeModal')">✕</button>
+      <h3>ارسال اعلان شخصی به <span id="targetUserSpan"></span></h3>
+      <textarea id="privateNoticeText" placeholder="متن پیام شخصی..."></textarea>
+      <button class="modal-btn" onclick="sendPrivateNotice()">ارسال اعلان</button>
+    </div>
+  </div>
+
+  <!-- پاپ آپ پیام‌های کاربران -->
+  <div class="modal-overlay" id="userMessagesModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('userMessagesModal')">✕</button>
+      <h3>پیام‌های کاربران</h3>
+      <div id="userMsgListContainer">در حال بارگذاری...</div>
+    </div>
+  </div>
+
+  <!-- پاپ آپ پاسخ به پیام کاربر -->
+  <div class="modal-overlay" id="replyModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('replyModal')">✕</button>
+      <h3>گفتگو با <span id="replyUserSpan"></span></h3>
+      <div class="chat-box" id="chatBox"></div>
+      <textarea id="replyText" placeholder="متن پاسخ..."></textarea>
+      <label>ارسال عکس پاسخ (اختیاری):</label>
+      <input type="file" id="replyImgFile" accept="image/*">
+      <button class="modal-btn" id="sendReplyBtn" onclick="sendReply()">ارسال پاسخ</button>
+    </div>
+  </div>
+
+  <script>
+    // احراز هویت اولیه مدیر و جلوگیری از خروج ناخواسته
+    if (sessionStorage.getItem('adminAuthenticated') !== 'true') {
+      window.location.href = 'index.html';
+    }
+
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+      history.pushState(null, null, location.href);
+      alert("برای خروج از پنل مدیریت از دکمه خروج بالای صفحه استفاده کنید.");
+    };
+
+    window.onbeforeunload = function() {
+      return "آیا مطمئن هستید؟";
+    };
+
+    let selectedTargetUser = null;
+
+    // توابع واسطه API
+    async function apiFirebase(path, method = 'GET', data = null) {
+      const options = { method, headers: { 'Content-Type': 'application/json' } };
+      if (data) options.body = JSON.stringify(data);
+      const res = await fetch(`/api/firebase?path=${path}`, options);
+      return res.json();
+    }
+
+    async function uploadToImgBB(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+          try {
+            const res = await fetch('/api/imgbb', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ image: reader.result })
+            });
+            const data = await res.json();
+            if (data.success) resolve(data.data.url);
+            else reject('خطا در آپلود عکس');
+          } catch (e) { reject(e); }
+        };
+      });
+    }
+
+    window.onload = () => {
+      loadAdminProducts();
+    };
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function logoutAdmin() {
+      window.onbeforeunload = null;
+      sessionStorage.removeItem('adminAuthenticated');
+      window.location.href = 'index.html';
+    }
+
+    // اطلاعات مدیر
+    async function openAdminInfoModal() {
+      const info = await apiFirebase('adminInfo') || { username: 'admin', password: 'admin' };
+      document.getElementById('newAdminUser').value = info.username;
+      document.getElementById('newAdminPass').value = info.password;
+      openModal('adminInfoModal');
+    }
+
+    async function saveAdminInfo() {
+      const u = document.getElementById('newAdminUser').value.trim();
+      const p = document.getElementById('newAdminPass').value.trim();
+      if (!u || !p) return alert('اطلاعات را کامل وارد کنید');
+      await apiFirebase('adminInfo', 'PUT', { username: u, password: p });
+      alert('اطلاعات مدیر با موفقیت بروزرسانی شد');
+      closeModal('adminInfoModal');
+    }
+
+    // مدیریت محصولات
+    async function loadAdminProducts() {
+      const container = document.getElementById('adminProductsList');
+      const products = await apiFirebase('products') || {};
+      container.innerHTML = '';
+      const keys = Object.keys(products);
+
+      if (keys.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#777;">محصولی وجود ندارد.</p>';
+        return;
+      }
+
+      keys.forEach(id => {
+        const p = products[id];
+        const item = document.createElement('div');
+        item.className = 'product-item';
+        item.innerHTML = `
+          <img src="${p.mainImage}" alt="${p.title}">
+          <div class="product-details">
+            <div class="product-title">${p.title}</div>
+            <div class="product-price">${p.price} تومان</div>
+          </div>
+          <div class="actions">
+            <button class="btn-sm btn-edit" onclick="editProduct('${id}')">ویرایش</button>
+            <button class="btn-sm btn-del" onclick="deleteProduct('${id}')">حذف</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function openAddProductModal() {
+      document.getElementById('productModalTitle').innerText = 'افزودن محصول';
+      document.getElementById('editProductId').value = '';
+      document.getElementById('pTitle').value = '';
+      document.getElementById('pPrice').value = '';
+      document.getElementById('pDesc').value = '';
+      document.getElementById('pCardNum').value = '';
+      document.getElementById('pCardName').value = '';
+      document.getElementById('pRubika').value = '';
+      openModal('productModal');
+    }
+
+    async function editProduct(id) {
+      const p = await apiFirebase(`products/${id}`);
+      if (!p) return;
+      document.getElementById('productModalTitle').innerText = 'ویرایش محصول';
+      document.getElementById('editProductId').value = id;
+      document.getElementById('pTitle').value = p.title;
+      document.getElementById('pPrice').value = p.price;
+      document.getElementById('pDesc').value = p.desc || '';
+      document.getElementById('pCardNum').value = p.cardNumber || '';
+      document.getElementById('pCardName').value = p.cardName || '';
+      document.getElementById('pRubika').value = p.rubika || '';
+      openModal('productModal');
+    }
+
+    async function saveProduct() {
+      const btn = document.getElementById('saveProductBtn');
+      const id = document.getElementById('editProductId').value;
+      const title = document.getElementById('pTitle').value.trim();
+      const price = document.getElementById('pPrice').value.trim();
+      const desc = document.getElementById('pDesc').value.trim();
+      const cardNumber = document.getElementById('pCardNum').value.trim();
+      const cardName = document.getElementById('pCardName').value.trim();
+      const rubika = document.getElementById('pRubika').value.trim();
+
+      const mainImgFile = document.getElementById('pMainImgFile').files[0];
+      const extraImgFiles = document.getElementById('pExtraImgFiles').files;
+
+      if (!title || !price) return alert('نام و قیمت محصول الزامی است');
+
+      btn.disabled = true;
+      btn.innerText = 'در حال پردازش و آپلود عکس‌ها...';
+
+      try {
+        let existing = id ? await apiFirebase(`products/${id}`) : {};
+        let mainImage = existing.mainImage || '';
+        let extraImages = existing.extraImages || [];
+
+        if (mainImgFile) {
+          mainImage = await uploadToImgBB(mainImgFile);
+        } else if (!id) {
+          btn.disabled = false;
+          btn.innerText = 'ثبت محصول';
+          return alert('انتخاب عکس اصلی برای محصول جدید الزامی است');
+        }
+
+        if (extraImgFiles.length > 0) {
+          extraImages = [];
+          for (let f of extraImgFiles) {
+            const url = await uploadToImgBB(f);
+            extraImages.push(url);
+          }
+        }
+
+        const productData = { title, price, mainImage, extraImages, desc, cardNumber, cardName, rubika };
+
+        if (id) {
+          await apiFirebase(`products/${id}`, 'PATCH', productData);
+        } else {
+          await apiFirebase('products', 'POST', productData);
+        }
+
+        closeModal('productModal');
+        loadAdminProducts();
+        alert('محصول با موفقیت ذخیره شد');
+      } catch (err) {
+        alert('خطا در ذخیره‌سازی محصول: ' + err);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'ثبت محصول';
+      }
+    }
+
+    async function deleteProduct(id) {
+      if (confirm('آیا از حذف این محصول اطمینان دارید؟')) {
+        await apiFirebase(`products/${id}`, 'DELETE');
+        loadAdminProducts();
+      }
+    }
+
+    // اعلان عمومی
+    function openPublicNoticeModal() { openModal('publicNoticeModal'); }
+    async function sendPublicNotice() {
+      const text = document.getElementById('publicNoticeText').value.trim();
+      if (!text) return alert('متن اعلان را وارد کنید');
+      await apiFirebase('notices/public', 'POST', { text, timestamp: Date.now() });
+      document.getElementById('publicNoticeText').value = '';
+      closeModal('publicNoticeModal');
+      alert('اعلان عمومی ارسال شد');
+    }
+
+    // کاربران و اعلان شخصی
+    async function openUsersModal() {
+      openModal('usersModal');
+      const container = document.getElementById('usersListContainer');
+      container.innerHTML = 'در حال بارگذاری...';
+      const users = await apiFirebase('users') || {};
+      container.innerHTML = '';
+
+      Object.keys(users).forEach(u => {
+        const usr = users[u];
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.onclick = () => openPrivateNoticeModal(usr.username);
+        item.innerHTML = `
+          <div>
+            <strong>${usr.name}</strong> (${usr.username})
+            <div style="font-size:0.75rem; color:#777;">رمز: ${usr.password}</div>
+          </div>
+          <span style="font-size:0.8rem; color:#007bff;">ارسال پیام ›</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function openPrivateNoticeModal(username) {
+      selectedTargetUser = username;
+      document.getElementById('targetUserSpan').innerText = username;
+      closeModal('usersModal');
+      openModal('privateNoticeModal');
+    }
+
+    async function sendPrivateNotice() {
+      const text = document.getElementById('privateNoticeText').value.trim();
+      if (!text || !selectedTargetUser) return alert('متن پیام را وارد کنید');
+      await apiFirebase(`notices/private/${selectedTargetUser}`, 'POST', { text, timestamp: Date.now() });
+      document.getElementById('privateNoticeText').value = '';
+      closeModal('privateNoticeModal');
+      alert('اعلان شخصی ارسال شد');
+    }
+
+    // پیام‌های کاربران
+    async function openMessagesModal() {
+      openModal('userMessagesModal');
+      const container = document.getElementById('userMsgListContainer');
+      container.innerHTML = 'در حال بارگذاری...';
+      const messages = await apiFirebase('messages') || {};
+      container.innerHTML = '';
+
+      const usersWhoSentMsg = Object.keys(messages);
+      if (usersWhoSentMsg.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#777;">هیچ پیامی دریافت نشده است.</p>';
+        return;
+      }
+
+      usersWhoSentMsg.forEach(u => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.onclick = () => openReplyModal(u);
+        item.innerHTML = `
+          <strong>گفتگو با ${u}</strong>
+          <span style="font-size:0.8rem; color:#28a745;">مشاهده و پاسخ ›</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    async function openReplyModal(username) {
+      selectedTargetUser = username;
+      document.getElementById('replyUserSpan').innerText = username;
+      closeModal('userMessagesModal');
+      openModal('replyModal');
+      loadChat();
+    }
+
+    async function loadChat() {
+      const chatBox = document.getElementById('chatBox');
+      chatBox.innerHTML = 'در حال بارگذاری گفتگو...';
+      const msgs = await apiFirebase(`messages/${selectedTargetUser}`) || {};
+      chatBox.innerHTML = '';
+
+      Object.values(msgs).forEach(m => {
+        const div = document.createElement('div');
+        div.className = `msg ${m.sender === 'admin' ? 'admin' : 'user'}`;
+        div.innerHTML = `
+          <div>${m.text || ''}</div>
+          ${m.img ? `<img src="${m.img}">` : ''}
+        `;
+        chatBox.appendChild(div);
+      });
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendReply() {
+      const text = document.getElementById('replyText').value.trim();
+      const imgFile = document.getElementById('replyImgFile').files[0];
+      const btn = document.getElementById('sendReplyBtn');
+
+      if (!text && !imgFile) return alert('متن یا تصویر را وارد کنید');
+
+      btn.disabled = true;
+      btn.innerText = 'در حال ارسال...';
+
+      try {
+        let img = '';
+        if (imgFile) img = await uploadToImgBB(imgFile);
+
+        await apiFirebase(`messages/${selectedTargetUser}`, 'POST', {
+          sender: 'admin',
+          text,
+          img,
+          timestamp: Date.now()
+        });
+
+        document.getElementById('replyText').value = '';
+        document.getElementById('replyImgFile').value = '';
+        loadChat();
+      } catch (err) {
+        alert('خطا در ارسال پاسخ: ' + err);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'ارسال پاسخ';
+      }
+    }
+  </script>
+</body>
+</html>
