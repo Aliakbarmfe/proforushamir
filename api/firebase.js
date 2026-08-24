@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 
-const FIREBASE_DB_URL = "https://proforosh-default-rtdb.firebaseio.com"; // آدرس پایگاه داده فایربیس شما
+const FIREBASE_DB_URL = "https://proforushamir-default-rtdb.firebaseio.com"; // آدرس پایگاه داده جدید شما
 
 module.exports = async (req, res) => {
   // تنظیم CORS برای دسترسی فرانت‌اند
