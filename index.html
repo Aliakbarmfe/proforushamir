@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>خدمات همه کاره</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
+    body { background-color: #f4f6f9; color: #333; padding-bottom: 30px; }
+    
+    /* هدر */
+    header {
+      background: #ffffff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-center { font-size: 1.2rem; font-weight: bold; color: #2c3e50; }
+    .header-left, .header-right { display: flex; align-items: center; gap: 10px; }
+    
+    /* دکمه‌ها و آیکون‌ها */
+    .icon-btn {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: #007bff;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      border: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .user-btn {
+      min-width: 50px;
+      padding: 0 10px;
+      border-radius: 25px;
+      background: #28a745;
+      color: #fff;
+      height: 45px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: bold;
+      border: none;
+      text-align: center;
+    }
+    .action-btn {
+      background: #17a2b8;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .dots-btn {
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    /* لیست محصولات */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .product-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      text-align: center;
+    }
+    .product-card img {
+      width: 100%;
+      aspect-ratio: 1/1;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .product-title { font-size: 0.95rem; font-weight: bold; margin: 8px 0 4px; }
+    .product-price { font-size: 0.85rem; color: #28a745; font-weight: bold; }
+
+    /* پاپ آپ‌ها */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 15px;
+    }
+    .modal {
+      background: #fff;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal h3 { margin-bottom: 15px; text-align: center; color: #333; }
+    .modal input, .modal textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .modal-btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    .modal-btn.danger { background: #dc3545; }
+    .modal-btn.secondary { background: #6c757d; margin-top: 8px; }
+    .close-modal {
+      position: absolute;
+      top: 10px; left: 10px;
+      border: none; background: none;
+      font-size: 1.2rem; cursor: pointer;
+    }
+
+    /* گالری تصاویر محصول */
+    .slider-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      margin-bottom: 15px;
+      scroll-snap-type: x mandatory;
+    }
+    .slider-container img {
+      width: 100%;
+      max-height: 250px;
+      object-fit: cover;
+      flex-shrink: 0;
+      scroll-snap-align: start;
+      border-radius: 8px;
+    }
+    
+    .notice-item {
+      background: #f8f9fa;
+      border-right: 4px solid #007bff;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- هدر سایت -->
+  <header>
+    <div class="header-right">
+      <button class="dots-btn" onclick="openModal('adminAuthModal')">⋮</button>
+    </div>
+    <div class="header-center">
+      💎 خدمات همه کاره 💎
+    </div>
+    <div class="header-left">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+        <button class="icon-btn" onclick="openNotices()">🔔</button>
+        <button class="action-btn" onclick="goToSupport()">پشتیبانی</button>
+      </div>
+      <button class="user-btn" id="userBtn" onclick="handleUserBtnClick()">ورود/ثبت نام</button>
+    </div>
+  </header>
+
+  <!-- لیست محصولات -->
+  <main class="products-grid" id="productsGrid">
+    <p style="grid-column: span 2; text-align: center; color: #777;">در حال بارگذاری محصولات...</p>
+  </main>
+
+  <!-- پاپ آپ انتخاب ورود/ثبت نام -->
+  <div class="modal-overlay" id="authChoiceModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('authChoiceModal')">✕</button>
+      <h3>ورود یا ثبت نام</h3>
+      <button class="modal-btn" onclick="switchModal('authChoiceModal', 'loginModal')">دکمه ورود (با رمز عبور)</button>
+      <button class="modal-btn secondary" onclick="switchModal('authChoiceModal', 'registerModal')">دکمه ثبت نام (اعضای جدید)</button>
+    </div>
+  </div>
+
+  <!-- پاپ آپ ثبت نام -->
+  <div class="modal-overlay" id="registerModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('registerModal')">✕</button>
+      <h3>ثبت نام کاربر جدید</h3>
+      <input type="text" id="regName" placeholder="نام (حداکثر ۶ حرف)" maxlength="6">
+      <input type="text" id="regUser" placeholder="نام کاربری (حداقل ۵ حرف)">
+      <input type="password" id="regPass" placeholder="رمز عبور (حداقل ۵ حرف)">
+      <button class="modal-btn" onclick="submitRegister()">ثبت نام</button>
+    </div>
+  </div>
+
+  <!-- پاپ آپ ورود -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('loginModal')">✕</button>
+      <h3>ورود به حساب</h3>
+      <input type="text" id="loginUser" placeholder="نام کاربری">
+      <input type="password" id="loginPass" placeholder="رمز عبور">
+      <button class="modal-btn" onclick="submitLogin()">ورود</button>
+    </div>
+  </div>
+
+  <!-- پاپ آپ مدیریت حساب کاربر -->
+  <div class="modal-overlay" id="userAccountModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('userAccountModal')">✕</button>
+      <h3>اطلاعات حساب کاربر</h3>
+      <p style="margin-bottom: 8px;"><strong>نام کاربری:</strong> <span id="accUsername"></span></p>
+      <p style="margin-bottom: 15px;"><strong>رمز عبور:</strong> <span id="accPassword"></span></p>
+      <button class="modal-btn danger" onclick="logoutUser()">خروج از حساب</button>
+    </div>
+  </div>
+
+  <!-- پاپ آپ ورود مدیر -->
+  <div class="modal-overlay" id="adminAuthModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('adminAuthModal')">✕</button>
+      <h3>ورود به پنل مدیریت</h3>
+      <input type="text" id="adminUser" placeholder="نام کاربری مدیر">
+      <input type="password" id="adminPass" placeholder="رمز عبور مدیر">
+      <button class="modal-btn" onclick="submitAdminLogin()">ورود به مدیریت</button>
+    </div>
+  </div>
+
+  <!-- پاپ آپ اعلان‌ها -->
+  <div class="modal-overlay" id="noticesModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('noticesModal')">✕</button>
+      <h3>اعلان‌های شما</h3>
+      <div id="noticesContainer">
+        <p style="text-align: center; color: #777;">در حال دریافت اعلان‌ها...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- پاپ آپ جزئیات محصول -->
+  <div class="modal-overlay" id="productDetailModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('productDetailModal')">✕</button>
+      <h3 id="pDetailTitle"></h3>
+      <div class="slider-container" id="pDetailSlider"></div>
+      <p style="margin-bottom: 8px;"><strong>قیمت:</strong> <span id="pDetailPrice"></span></p>
+      <p style="margin-bottom: 15px; color: #555;" id="pDetailDesc"></p>
+      <button class="modal-btn" onclick="openBuyModal()">خرید محصول</button>
+    </div>
+  </div>
+
+  <!-- پاپ آپ پرداخت و اطلاعات تماس -->
+  <div class="modal-overlay" id="buyModal">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('buyModal')">✕</button>
+      <h3>اطلاعات پرداخت</h3>
+      <p style="margin-bottom: 8px;"><strong>شماره کارت:</strong> <span id="payCardNum"></span></p>
+      <p style="margin-bottom: 8px;"><strong>نام صاحب کارت:</strong> <span id="payCardName"></span></p>
+      <p style="margin-bottom: 15px;"><strong>آیدی روبیکا:</strong> <span id="payRubika"></span></p>
+      <button class="modal-btn" onclick="goToSupportWithReceipt()">ارسال رسید از طریق سایت</button>
+    </div>
+  </div>
+
+  <script>
+    // متغیرهای ذخیره‌سازی محلی
+    let currentUser = JSON.parse(localStorage.getItem('user')) || null;
+    let selectedProduct = null;
+
+    // توابع API واسطه
+    async function apiFirebase(path, method = 'GET', data = null) {
+      const options = {
+        method,
+        headers: { 'Content-Type': 'application/json' }
+      };
+      if (data) options.body = JSON.stringify(data);
+      const res = await fetch(`/api/firebase?path=${path}`, options);
+      return res.json();
+    }
+
+    // مقداردهی اولیه
+    window.onload = () => {
+      updateUserUI();
+      loadProducts();
+    };
+
+    function updateUserUI() {
+      const btn = document.getElementById('userBtn');
+      if (currentUser) {
+        btn.innerText = currentUser.name || currentUser.username;
+      } else {
+        btn.innerText = 'ورود/ثبت نام';
+      }
+    }
+
+    function handleUserBtnClick() {
+      if (currentUser) {
+        document.getElementById('accUsername').innerText = currentUser.username;
+        document.getElementById('accPassword').innerText = currentUser.password;
+        openModal('userAccountModal');
+      } else {
+        openModal('authChoiceModal');
+      }
+    }
+
+    // پاپ آپ‌ها
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function switchModal(from, to) { closeModal(from); openModal(to); }
+
+    // ثبت نام
+    async function submitRegister() {
+      const name = document.getElementById('regName').value.trim();
+      const username = document.getElementById('regUser').value.trim();
+      const password = document.getElementById('regPass').value.trim();
+
+      if (name.length > 6 || name.length === 0) return alert('نام باید حداکثر ۶ حرف باشد');
+      if (username.length < 5) return alert('نام کاربری باید حداقل ۵ حرف باشد');
+      if (password.length < 5) return alert('رمز عبور باید حداقل ۵ حرف باشد');
+
+      const users = await apiFirebase('users') || {};
+      if (users[username]) return alert('این نام کاربری از قبل وجود دارد');
+
+      const userData = { name, username, password };
+      await apiFirebase(`users/${username}`, 'PUT', userData);
+
+      currentUser = userData;
+      localStorage.setItem('user', JSON.stringify(currentUser));
+      updateUserUI();
+      closeModal('registerModal');
+      alert('ثبت نام موفقیت آمیز بود');
+    }
+
+    // ورود
+    async function submitLogin() {
+      const username = document.getElementById('loginUser').value.trim();
+      const password = document.getElementById('loginPass').value.trim();
+
+      const user = await apiFirebase(`users/${username}`);
+      if (!user || user.password !== password) {
+        return alert('نام کاربری یا رمز عبور اشتباه است');
+      }
+
+      currentUser = user;
+      localStorage.setItem('user', JSON.stringify(currentUser));
+      updateUserUI();
+      closeModal('loginModal');
+      alert('ورود موفقیت آمیز بود');
+    }
+
+    function logoutUser() {
+      currentUser = null;
+      localStorage.removeItem('user');
+      updateUserUI();
+      closeModal('userAccountModal');
+    }
+
+    // پشتیبانی و پیام رسانی
+    function goToSupport() {
+      if (!currentUser) return alert('لطفاً اول ثبت نام کنید.');
+      window.location.href = 'posht.html';
+    }
+
+    function goToSupportWithReceipt() {
+      if (!currentUser) return alert('لطفاً اول ثبت نام کنید.');
+      window.location.href = 'posht.html?action=receipt';
+    }
+
+    // اعلانات
+    async function openNotices() {
+      if (!currentUser) return alert('لطفاً اول ثبت نام کنید.');
+      openModal('noticesModal');
+      const container = document.getElementById('noticesContainer');
+      container.innerHTML = 'در حال دریافت...';
+
+      const publicNotices = await apiFirebase('notices/public') || {};
+      const privateNotices = await apiFirebase(`notices/private/${currentUser.username}`) || {};
+
+      let html = '';
+      
+      // عمومی
+      Object.values(publicNotices).forEach(n => {
+        html += `<div class="notice-item"><strong>عمومی:</strong> ${n.text}</div>`;
+      });
+      // شخصی
+      Object.values(privateNotices).forEach(n => {
+        html += `<div class="notice-item" style="border-color:#28a745;"><strong>شخصی:</strong> ${n.text}</div>`;
+      });
+
+      container.innerHTML = html || '<p style="text-align:center;">اعلانی وجود ندارد.</p>';
+    }
+
+    // ورود مدیر
+    async function submitAdminLogin() {
+      const u = document.getElementById('adminUser').value.trim();
+      const p = document.getElementById('adminPass').value.trim();
+
+      const adminInfo = await apiFirebase('adminInfo') || { username: 'admin', password: 'admin' };
+      if (u === adminInfo.username && p === adminInfo.password) {
+        sessionStorage.setItem('adminAuthenticated', 'true');
+        window.location.href = 'modiree.html';
+      } else {
+        alert('اطلاعات مدیر اشتباه است');
+      }
+    }
+
+    // بارگذاری محصولات
+    async function loadProducts() {
+      const grid = document.getElementById('productsGrid');
+      const products = await apiFirebase('products') || {};
+
+      grid.innerHTML = '';
+      const keys = Object.keys(products);
+
+      if (keys.length === 0) {
+        grid.innerHTML = '<p style="grid-column: span 2; text-align: center; color: #777;">محصولی یافت نشد.</p>';
+        return;
+      }
+
+      keys.forEach(key => {
+        const p = products[key];
+        p.id = key;
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.onclick = () => openProductDetail(p);
+        card.innerHTML = `
+          <img src="${p.mainImage}" alt="${p.title}">
+          <div class="product-title">${p.title}</div>
+          <div class="product-price">${p.price} تومان</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function openProductDetail(p) {
+      selectedProduct = p;
+      document.getElementById('pDetailTitle').innerText = p.title;
+      document.getElementById('pDetailPrice').innerText = `${p.price} تومان`;
+      document.getElementById('pDetailDesc').innerText = p.desc || 'توضیحاتی وجود ندارد.';
+
+      const slider = document.getElementById('pDetailSlider');
+      slider.innerHTML = `<img src="${p.mainImage}">`;
+      
+      if (p.extraImages && Array.isArray(p.extraImages)) {
+        p.extraImages.forEach(imgUrl => {
+          slider.innerHTML += `<img src="${imgUrl}">`;
+        });
+      }
+
+      openModal('productDetailModal');
+    }
+
+    function openBuyModal() {
+      if (!selectedProduct) return;
+      closeModal('productDetailModal');
+      document.getElementById('payCardNum').innerText = selectedProduct.cardNumber || 'ثبت نشده';
+      document.getElementById('payCardName').innerText = selectedProduct.cardName || 'ثبت نشده';
+      document.getElementById('payRubika').innerText = selectedProduct.rubika || 'ثبت نشده';
+      openModal('buyModal');
+    }
+  </script>
+</body>
+</html>
