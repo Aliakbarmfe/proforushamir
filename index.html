@@ -355,8 +355,17 @@
 
     // پاپ آپ‌ها
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function switchModal(from, to) { closeModal(from); openModal(to); }
+    function closeModal(id) { 
+      // جلوگیری از بستن پنجره‌های ورود در صورت عدم وجود کاربر
+      if (!currentUser && (id === 'authChoiceModal' || id === 'loginModal' || id === 'registerModal')) {
+        return;
+      }
+      document.getElementById(id).style.display = 'none'; 
+    }
+    function switchModal(from, to) { 
+      document.getElementById(from).style.display = 'none'; 
+      openModal(to); 
+    }
 
     // ثبت نام
     async function submitRegister() {
@@ -377,8 +386,9 @@
       currentUser = userData;
       localStorage.setItem('user', JSON.stringify(currentUser));
       updateUserUI();
-      closeModal('registerModal');
+      document.getElementById('registerModal').style.display = 'none';
       alert('ثبت نام موفقیت آمیز بود');
+      loadProducts();
     }
 
     // ورود
@@ -394,15 +404,17 @@
       currentUser = user;
       localStorage.setItem('user', JSON.stringify(currentUser));
       updateUserUI();
-      closeModal('loginModal');
+      document.getElementById('loginModal').style.display = 'none';
       alert('ورود موفقیت آمیز بود');
+      loadProducts();
     }
 
     function logoutUser() {
       currentUser = null;
       localStorage.removeItem('user');
       updateUserUI();
-      closeModal('userAccountModal');
+      document.getElementById('userAccountModal').style.display = 'none';
+      loadProducts();
     }
 
     // پشتیبانی و پیام رسانی
@@ -457,6 +469,15 @@
     // بارگذاری محصولات
     async function loadProducts() {
       const grid = document.getElementById('productsGrid');
+      
+      // بررسی ورود کاربر قبل از دریافت آگهی‌ها
+      if (!currentUser) {
+        grid.innerHTML = '<p style="grid-column: span 2; text-align: center; color: #D1D5DB;">برای مشاهده آگهی‌ها، ابتدا وارد حساب کاربری خود شوید یا ثبت‌نام کنید.</p>';
+        openModal('authChoiceModal');
+        return;
+      }
+
+      grid.innerHTML = '<p style="grid-column: span 2; text-align: center; color: #D1D5DB;">در حال بارگذاری آگهی‌ها...</p>';
       const products = await apiFirebase('products') || {};
 
       grid.innerHTML = '';
@@ -502,7 +523,7 @@
 
     function openBuyModal() {
       if (!selectedProduct) return;
-      closeModal('productDetailModal');
+      document.getElementById('productDetailModal').style.display = 'none';
       document.getElementById('payCardNum').innerText = selectedProduct.cardNumber || 'ثبت نشده';
       document.getElementById('payCardName').innerText = selectedProduct.cardName || 'ثبت نشده';
       document.getElementById('payRubika').innerText = selectedProduct.rubika || 'ثبت نشده';
