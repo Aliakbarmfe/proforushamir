@@ -299,6 +299,7 @@
           imgUrl = await uploadToImgBB(file);
         }
 
+        // ۱. ارسال پیام کاربر
         const msgData = {
           sender: currentUser.username,
           text,
@@ -307,6 +308,17 @@
         };
 
         await apiFirebase(`messages/${currentUser.username}`, 'POST', msgData);
+
+        // ۲. پاسخ خودکار از سمت مدیر در صورت وجود عکس
+        if (file) {
+          const autoReplyData = {
+            sender: 'admin',
+            text: 'نتیجه از طریق اعلانات (آیکون زنگوله) به شما گفته خواهد شد.',
+            img: '',
+            timestamp: Date.now() + 1 // تاخیر جزئی برای ترتیب صحیح پیام‌ها
+          };
+          await apiFirebase(`messages/${currentUser.username}`, 'POST', autoReplyData);
+        }
 
         textInput.value = '';
         fileInput.value = '';
