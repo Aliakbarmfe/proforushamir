@@ -52,7 +52,49 @@
       font-size: 1.2rem;
       border: 1px solid #2E344D;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      position: relative;
     }
+    
+    /* نشانگر قرمز تعداد اعلان‌ها */
+    .notification-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background-color: #ff3b30;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      border: 2px solid #1C2033;
+      display: none; /* در حالت عادی اگر صفر باشد مخفی می‌شود */
+    }
+
+    /* دکمه پشتیبانی شناور در پایین سمت راست */
+    .floating-support-btn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background: #4F6BF5;
+      color: white;
+      border: 1px solid #2E344D;
+      padding: 12px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      z-index: 990;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .floating-support-btn:hover {
+      background: #3b57e2;
+      transform: scale(1.05);
+    }
+
     .user-btn {
       min-width: 50px;
       padding: 0 10px;
@@ -68,15 +110,6 @@
       font-weight: bold;
       border: 1px solid #2E344D;
       text-align: center;
-    }
-    .action-btn {
-      background: #4F6BF5;
-      color: white;
-      border: 1px solid #2E344D;
-      padding: 6px 12px;
-      border-radius: 15px;
-      cursor: pointer;
-      font-size: 0.8rem;
     }
     .dots-btn {
       background: none;
@@ -232,13 +265,18 @@
       💎 خدمات همه کاره 💎
     </div>
     <div class="header-left">
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
-        <button class="icon-btn" onclick="openNotices()">🔔</button>
-        <button class="action-btn" onclick="goToSupport()">پشتیبانی</button>
-      </div>
+      <button class="icon-btn" onclick="openNotices()">
+        🔔
+        <span class="notification-badge" id="noticeBadge">0</span>
+      </button>
       <button class="user-btn" id="userBtn" onclick="handleUserBtnClick()">ورود</button>
     </div>
   </header>
+
+  <!-- دکمه پشتیبانی شناور (پایین سمت راست) -->
+  <button class="floating-support-btn" onclick="goToSupport()">
+    💬 پشتیبانی
+  </button>
 
   <!-- لیست محصولات -->
   <main class="products-grid" id="productsGrid">
@@ -308,6 +346,7 @@
   <script>
     let currentUser = JSON.parse(localStorage.getItem('user')) || null;
     let selectedProduct = null;
+    let unreadCount = 0;
 
     async function apiFirebase(path, method = 'GET', data = null) {
       const options = {
@@ -322,6 +361,7 @@
     window.onload = () => {
       updateUserUI();
       loadProducts();
+      checkUnreadNotices();
     };
 
     function updateUserUI() {
@@ -355,6 +395,32 @@
       document.getElementById(id).style.display = 'none'; 
     }
 
+    async function checkUnreadNotices() {
+      if (!currentUser) return;
+      
+      const publicNotices = await apiFirebase('notices/public') || {};
+      const privateNotices = await apiFirebase(`notices/private/${currentUser.username}`) || {};
+      
+      const totalNotices = Object.keys(publicNotices).length + Object.keys(privateNotices).length;
+      
+      // تعداد اعلان‌های قبلاً خوانده‌شده از حافظه مرزی خوانده می‌شود
+      const readNoticesCount = parseInt(localStorage.getItem(`readNotices_${currentUser.username}`) || '0');
+      
+      unreadCount = Math.max(0, totalNotices - readNoticesCount);
+      updateBadgeUI();
+    }
+
+    function updateBadgeUI() {
+      const badge = document.getElementById('noticeBadge');
+      if (unreadCount > 0) {
+        badge.innerText = unreadCount;
+        badge.style.display = 'block';
+      } else {
+        badge.innerText = '0';
+        badge.style.display = 'none';
+      }
+    }
+
     async function submitUnifiedAuth() {
       const name = document.getElementById('authName').value.trim();
       const username = document.getElementById('authUser').value.trim();
@@ -376,6 +442,7 @@
         updateUserUI();
         document.getElementById('unifiedAuthModal').style.display = 'none';
         loadProducts();
+        checkUnreadNotices();
       } else {
         // نام کاربری وجود ندارد -> ثبت نام جدید
         const userData = { name, username, password };
@@ -387,6 +454,7 @@
         document.getElementById('unifiedAuthModal').style.display = 'none';
         alert('ثبت نام موفقیت آمیز بود');
         loadProducts();
+        checkUnreadNotices();
       }
     }
 
@@ -396,6 +464,7 @@
       updateUserUI();
       document.getElementById('userAccountModal').style.display = 'none';
       loadProducts();
+      updateBadgeUI();
     }
 
     function goToSupport() {
@@ -419,14 +488,23 @@
 
       let html = '';
       
-      Object.values(publicNotices).forEach(n => {
+      const pubList = Object.values(publicNotices);
+      const privList = Object.values(privateNotices);
+
+      pubList.forEach(n => {
         html += `<div class="notice-item"><strong>عمومی:</strong> ${n.text}</div>`;
       });
-      Object.values(privateNotices).forEach(n => {
+      privList.forEach(n => {
         html += `<div class="notice-item" style="border-color:#5E81FF;"><strong>شخصی:</strong> ${n.text}</div>`;
       });
 
       container.innerHTML = html || '<p style="text-align:center; color:#D1D5DB;">اعلانی وجود ندارد.</p>';
+
+      // صفر کردن تعداد پیام‌های خوانده‌نشده هنگام مشاهده اعلان‌ها
+      const totalNotices = pubList.length + privList.length;
+      localStorage.setItem(`readNotices_${currentUser.username}`, totalNotices);
+      unreadCount = 0;
+      updateBadgeUI();
     }
 
     async function submitAdminLogin() {
