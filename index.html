@@ -6,21 +6,27 @@
   <title>خدمات همه کاره</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
-    body { background-color: #f4f6f9; color: #333; padding-bottom: 30px; }
+    body { 
+      background: linear-gradient(to bottom, #14192C, #0B0E1A); 
+      color: #D1D5DB; 
+      padding-bottom: 30px; 
+      min-height: 100vh;
+    }
     
     /* هدر */
     header {
-      background: #ffffff;
+      background: #1C2033;
       padding: 15px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
       position: sticky;
       top: 0;
       z-index: 100;
+      border-bottom: 1px solid #2E344D;
     }
-    .header-center { font-size: 1.2rem; font-weight: bold; color: #2c3e50; }
+    .header-center { font-size: 1.2rem; font-weight: bold; color: #5E81FF; }
     .header-left, .header-right { display: flex; align-items: center; gap: 10px; }
     
     /* دکمه‌ها و آیکون‌ها */
@@ -28,21 +34,21 @@
       width: 45px;
       height: 45px;
       border-radius: 50%;
-      background: #007bff;
+      background: #4F6BF5;
       color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
       font-size: 1.2rem;
-      border: none;
+      border: 1px solid #2E344D;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .user-btn {
       min-width: 50px;
       padding: 0 10px;
       border-radius: 25px;
-      background: #28a745;
+      background: #4F6BF5;
       color: #fff;
       height: 45px;
       display: flex;
@@ -51,13 +57,13 @@
       cursor: pointer;
       font-size: 0.85rem;
       font-weight: bold;
-      border: none;
+      border: 1px solid #2E344D;
       text-align: center;
     }
     .action-btn {
-      background: #17a2b8;
+      background: #4F6BF5;
       color: white;
-      border: none;
+      border: 1px solid #2E344D;
       padding: 6px 12px;
       border-radius: 15px;
       cursor: pointer;
@@ -69,6 +75,7 @@
       font-size: 1.8rem;
       cursor: pointer;
       padding: 5px;
+      color: #D1D5DB;
     }
 
     /* لیست محصولات */
@@ -81,10 +88,11 @@
       margin: 0 auto;
     }
     .product-card {
-      background: #fff;
+      background: #1C2033;
+      border: 1px solid #2E344D;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       cursor: pointer;
       display: flex;
       flex-direction: column;
@@ -97,15 +105,16 @@
       aspect-ratio: 1/1;
       object-fit: cover;
       border-radius: 8px;
+      border: 1px solid #2E344D;
     }
-    .product-title { font-size: 0.95rem; font-weight: bold; margin: 8px 0 4px; }
-    .product-price { font-size: 0.85rem; color: #28a745; font-weight: bold; }
+    .product-title { font-size: 0.95rem; font-weight: bold; margin: 8px 0 4px; color: #5E81FF; }
+    .product-price { font-size: 0.85rem; color: #D1D5DB; font-weight: bold; }
 
     /* پاپ آپ‌ها */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(11, 14, 26, 0.8);
       display: none;
       justify-content: center;
       align-items: center;
@@ -113,43 +122,48 @@
       padding: 15px;
     }
     .modal {
-      background: #fff;
+      background: #1C2033;
+      border: 1px solid #2E344D;
       width: 100%;
       max-width: 400px;
       border-radius: 12px;
       padding: 20px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
       position: relative;
       max-height: 90vh;
       overflow-y: auto;
+      color: #D1D5DB;
     }
-    .modal h3 { margin-bottom: 15px; text-align: center; color: #333; }
+    .modal h3 { margin-bottom: 15px; text-align: center; color: #5E81FF; }
     .modal input, .modal textarea {
       width: 100%;
       padding: 10px;
       margin-bottom: 12px;
-      border: 1px solid #ccc;
+      background: #0B0E1A;
+      border: 1px solid #2E344D;
       border-radius: 6px;
       font-size: 0.9rem;
+      color: #D1D5DB;
     }
     .modal-btn {
       width: 100%;
       padding: 10px;
-      border: none;
+      border: 1px solid #2E344D;
       border-radius: 6px;
-      background: #007bff;
+      background: #4F6BF5;
       color: #fff;
       font-size: 1rem;
       cursor: pointer;
       margin-top: 5px;
     }
     .modal-btn.danger { background: #dc3545; }
-    .modal-btn.secondary { background: #6c757d; margin-top: 8px; }
+    .modal-btn.secondary { background: #2E344D; margin-top: 8px; color: #D1D5DB; }
     .close-modal {
       position: absolute;
       top: 10px; left: 10px;
       border: none; background: none;
       font-size: 1.2rem; cursor: pointer;
+      color: #D1D5DB;
     }
 
     /* گالری تصاویر محصول */
@@ -167,15 +181,20 @@
       flex-shrink: 0;
       scroll-snap-align: start;
       border-radius: 8px;
+      border: 1px solid #2E344D;
     }
     
     .notice-item {
-      background: #f8f9fa;
-      border-right: 4px solid #007bff;
+      background: #0B0E1A;
+      border-right: 4px solid #4F6BF5;
+      border-top: 1px solid #2E344D;
+      border-bottom: 1px solid #2E344D;
+      border-left: 1px solid #2E344D;
       padding: 10px;
       margin-bottom: 10px;
       border-radius: 4px;
       font-size: 0.9rem;
+      color: #D1D5DB;
     }
   </style>
 </head>
@@ -200,7 +219,7 @@
 
   <!-- لیست محصولات -->
   <main class="products-grid" id="productsGrid">
-    <p style="grid-column: span 2; text-align: center; color: #777;">در حال بارگذاری محصولات...</p>
+    <p style="grid-column: span 2; text-align: center; color: #D1D5DB;">در حال بارگذاری محصولات...</p>
   </main>
 
   <!-- پاپ آپ انتخاب ورود/ثبت نام -->
@@ -264,7 +283,7 @@
       <button class="close-modal" onclick="closeModal('noticesModal')">✕</button>
       <h3>اعلان‌های شما</h3>
       <div id="noticesContainer">
-        <p style="text-align: center; color: #777;">در حال دریافت اعلان‌ها...</p>
+        <p style="text-align: center; color: #D1D5DB;">در حال دریافت اعلان‌ها...</p>
       </div>
     </div>
   </div>
@@ -276,7 +295,7 @@
       <h3 id="pDetailTitle"></h3>
       <div class="slider-container" id="pDetailSlider"></div>
       <p style="margin-bottom: 8px;"><strong>قیمت:</strong> <span id="pDetailPrice"></span></p>
-      <p style="margin-bottom: 15px; color: #555;" id="pDetailDesc"></p>
+      <p style="margin-bottom: 15px; color: #D1D5DB;" id="pDetailDesc"></p>
       <button class="modal-btn" onclick="openBuyModal()">خرید محصول</button>
     </div>
   </div>
@@ -415,10 +434,10 @@
       });
       // شخصی
       Object.values(privateNotices).forEach(n => {
-        html += `<div class="notice-item" style="border-color:#28a745;"><strong>شخصی:</strong> ${n.text}</div>`;
+        html += `<div class="notice-item" style="border-color:#5E81FF;"><strong>شخصی:</strong> ${n.text}</div>`;
       });
 
-      container.innerHTML = html || '<p style="text-align:center;">اعلانی وجود ندارد.</p>';
+      container.innerHTML = html || '<p style="text-align:center; color:#D1D5DB;">اعلانی وجود ندارد.</p>';
     }
 
     // ورود مدیر
@@ -444,7 +463,7 @@
       const keys = Object.keys(products);
 
       if (keys.length === 0) {
-        grid.innerHTML = '<p style="grid-column: span 2; text-align: center; color: #777;">محصولی یافت نشد.</p>';
+        grid.innerHTML = '<p style="grid-column: span 2; text-align: center; color: #D1D5DB;">محصولی یافت نشد.</p>';
         return;
       }
 
