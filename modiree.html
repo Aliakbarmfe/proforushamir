@@ -19,7 +19,7 @@
       color: #fff;
       padding: 15px 20px;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between; /* تغییر برای چیدمان راست و چپ */
       align-items: center;
       position: sticky;
       top: 0;
@@ -27,6 +27,21 @@
       border-bottom: 1px solid #2E344D;
       box-shadow: 0 2px 8px rgba(0,0,0,0.4);
     }
+    
+    /* نمایش تعداد آگهی سمت راست هدر */
+    .header-right-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #5E81FF;
+      background: #0B0E1A;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid #2E344D;
+    }
+
     .header-left-group {
       display: flex;
       align-items: center;
@@ -46,7 +61,7 @@
       background: #bd2130;
     }
 
-    /* کانتینر اصلی و چیدمان تک ستونی (یک دکمه در هر ردیف) */
+    /* کانتینر اصلی و چیدمان تک ستونی */
     .container { 
       padding: 20px; 
       max-width: 500px; 
@@ -62,6 +77,7 @@
 
     /* هم‌اندازه کردن و استایل دکمه‌های اصلی */
     .main-btn {
+      position: relative;
       width: 100%;
       height: 60px;
       display: flex;
@@ -83,7 +99,6 @@
       transform: scale(0.98);
     }
     .main-btn.stats { background: #4F6BF5; }
-    .main-btn.count { background: #1C2033; color: #5E81FF; cursor: default; }
     .main-btn.ads { background: #4F6BF5; }
     .main-btn.private { background: #4F6BF5; }
     .main-btn.public { background: #4F6BF5; color: #fff; }
@@ -118,7 +133,7 @@
     .btn-edit { background: #4F6BF5; color: #fff; }
     .btn-del { background: #dc3545; }
 
-    /* پاپ آپ‌ها (بزرگ و ۹۵ درصد اندازه صفحه) */
+    /* پاپ آپ‌ها */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -202,20 +217,50 @@
       display: flex;
       flex-direction: column;
     }
-    .msg { margin-bottom: 8px; padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; max-width: 80%; }
+    .msg { margin-bottom: 12px; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; max-width: 80%; }
     .msg.user { background: #2E344D; color: #D1D5DB; align-self: flex-start; }
     .msg.admin { background: #4F6BF5; color: #fff; align-self: flex-end; text-align: right; }
-    .msg img { max-width: 100%; border-radius: 4px; margin-top: 5px; display: block; border: 1px solid #2E344D; }
     
-    /* نشانگر پیام‌های جدید */
-    .unread-badge {
+    /* استایل بخش عکس و دکمه دانلود در چت */
+    .msg-img-container {
+      margin-top: 6px;
+      position: relative;
+    }
+    .msg img { max-width: 100%; border-radius: 4px; display: block; border: 1px solid #2E344D; }
+    .btn-download {
+      display: inline-block;
+      margin-top: 5px;
+      padding: 4px 8px;
+      background: #28a745;
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.75rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-download:hover { background: #218838; }
+    
+    /* نشانگر قرمز تعداد پیام‌های جدید (فقط عدد) */
+    .red-badge {
       background: #dc3545;
       color: #fff;
-      font-size: 0.8rem;
-      padding: 2px 8px;
-      border-radius: 12px;
+      font-size: 0.75rem;
+      min-width: 22px;
+      height: 22px;
+      line-height: 22px;
+      text-align: center;
+      border-radius: 50%;
       font-weight: bold;
-      margin-right: 8px;
+      display: inline-block;
+      box-shadow: 0 0 4px rgba(220, 53, 69, 0.6);
+    }
+    /* بج مخصوص روی دکمه اصلی پشتیبانی */
+    .main-btn .red-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      border: 2px solid #1C2033;
     }
   </style>
 </head>
@@ -223,6 +268,12 @@
 
   <!-- هدر پنل مدیریت -->
   <header>
+    <!-- بالای سایت سمت راست: نمایش تعداد آگهی -->
+    <div class="header-right-group">
+      <span>تعداد آگهی:</span>
+      <span id="mainAdsCount">0</span>
+    </div>
+
     <!-- بالای سایت سمت چپ: دکمه خروج -->
     <div class="header-left-group">
       <button class="btn-logout" onclick="logoutAdmin()">خروج از پنل</button>
@@ -235,20 +286,20 @@
       <!-- 1. آمار کاربران -->
       <button class="main-btn stats" onclick="openUserStatsModal()">آمار کاربران</button>
       
-      <!-- 2. تعداد آگهی -->
-      <button class="main-btn count">تعداد آگهی: <span id="mainAdsCount" style="margin-right: 5px;">0</span></button>
-      
-      <!-- 3. مدیریت آگهی -->
+      <!-- 2. مدیریت آگهی -->
       <button class="main-btn ads" onclick="openAdsManagerModal()">مدیریت آگهی</button>
       
-      <!-- 4. ارسال پیام به کاربر -->
+      <!-- 3. ارسال پیام به کاربر -->
       <button class="main-btn private" onclick="openUsersModalForNotice()">ارسال پیام به کاربر</button>
       
-      <!-- 5. پیام همگانی -->
+      <!-- 4. پیام همگانی -->
       <button class="main-btn public" onclick="openPublicNoticeModal()">پیام همگانی</button>
       
-      <!-- 6. پیام‌های پشتیبانی -->
-      <button class="main-btn msg" id="supportBtn" onclick="openUserMessagesModal()">پیام های پشتیبانی</button>
+      <!-- 5. پیام‌های پشتیبانی -->
+      <button class="main-btn msg" id="supportBtn" onclick="openUserMessagesModal()">
+        پیام های پشتیبانی
+        <span class="red-badge" id="btnBadge" style="display: none;">0</span>
+      </button>
     </div>
   </div>
 
@@ -325,7 +376,7 @@
     </div>
   </div>
 
-  <!-- پاپ آپ پیام‌های کاربران (ارسال پیام به کاربر) -->
+  <!-- پاپ آپ پیام‌های کاربران -->
   <div class="modal-overlay" id="userMessagesModal">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('userMessagesModal')">✕</button>
@@ -410,7 +461,7 @@
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    // محاسبه و بروزرسانی تعداد پیام‌های پشتیبانی در دکمه اصلی
+    // محاسبه و بروزرسانی نشانگر قرمز پیام‌های پشتیبانی
     async function checkNewSupportMessages() {
       const messages = await apiFirebase('messages') || {};
       let totalUnread = 0;
@@ -424,15 +475,16 @@
         });
       });
 
-      const supportBtn = document.getElementById('supportBtn');
+      const badge = document.getElementById('btnBadge');
       if (totalUnread > 0) {
-        supportBtn.innerText = `پیام های پشتیبانی (${totalUnread} پیام جدید)`;
+        badge.innerText = totalUnread;
+        badge.style.display = 'inline-block';
       } else {
-        supportBtn.innerText = `پیام های پشتیبانی`;
+        badge.style.display = 'none';
       }
     }
 
-    // بروزرسانی تعداد آگهی‌ها
+    // بروزرسانی تعداد آگهی‌ها در هدر بالای صفحه
     async function updateAdsCount() {
       const products = await apiFirebase('products') || {};
       const count = Object.keys(products).length;
@@ -653,7 +705,7 @@
       alert('اعلان شخصی ارسال شد');
     }
 
-    // پیام‌های کاربران (ارسال پیام به کاربر)
+    // پیام‌های کاربران
     async function openUserMessagesModal() {
       openModal('userMessagesModal');
       const container = document.getElementById('userMsgListContainer');
@@ -683,7 +735,7 @@
         item.innerHTML = `
           <div>
             <strong>گفتگو با ${u}</strong>
-            ${unreadCount > 0 ? `<span class="unread-badge">${unreadCount} پیام جدید</span>` : ''}
+            ${unreadCount > 0 ? `<span class="red-badge" style="margin-right:8px;">${unreadCount}</span>` : ''}
           </div>
           <span style="font-size:0.8rem; color:#5E81FF;">مشاهده و پاسخ ›</span>
         `;
@@ -730,9 +782,20 @@
       Object.values(msgs).forEach(m => {
         const div = document.createElement('div');
         div.className = `msg ${m.sender === 'admin' ? 'admin' : 'user'}`;
+        
+        let imgHTML = '';
+        if (m.img) {
+          imgHTML = `
+            <div class="msg-img-container">
+              <img src="${m.img}">
+              <a href="${m.img}" target="_blank" download="support-image.jpg" class="btn-download">دانلود تصویر</a>
+            </div>
+          `;
+        }
+
         div.innerHTML = `
           <div>${m.text || ''}</div>
-          ${m.img ? `<img src="${m.img}">` : ''}
+          ${imgHTML}
         `;
         chatBox.appendChild(div);
       });
