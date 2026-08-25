@@ -6,11 +6,16 @@
   <title>پنل مدیریت</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
-    body { background-color: #f0f2f5; color: #333; padding-bottom: 20px; }
+    body { 
+      background: linear-gradient(to bottom, #14192C, #0B0E1A); 
+      color: #D1D5DB; 
+      padding-bottom: 20px; 
+      min-height: 100vh;
+    }
 
     /* هدر مدیریت */
     header {
-      background: #343a40;
+      background: #1C2033;
       color: #fff;
       padding: 15px 20px;
       display: flex;
@@ -19,6 +24,8 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      border-bottom: 1px solid #2E344D;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
     }
     .header-left-group {
       display: flex;
@@ -28,7 +35,7 @@
     .btn-logout {
       background: #dc3545;
       color: white;
-      border: none;
+      border: 1px solid #2E344D;
       padding: 8px 15px;
       border-radius: 6px;
       cursor: pointer;
@@ -61,60 +68,61 @@
       justify-content: center;
       align-items: center;
       padding: 10px;
-      border: none;
+      border: 1px solid #2E344D;
       border-radius: 8px;
-      background: #007bff;
+      background: #4F6BF5;
       color: #fff;
       font-size: 1rem;
       cursor: pointer;
       font-weight: bold;
       text-align: center;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
       transition: background 0.2s, transform 0.1s;
     }
     .main-btn:active {
       transform: scale(0.98);
     }
-    .main-btn.stats { background: #17a2b8; }
-    .main-btn.count { background: #6c757d; cursor: default; }
-    .main-btn.ads { background: #28a745; }
-    .main-btn.private { background: #007bff; }
-    .main-btn.public { background: #ffc107; color: #000; }
-    .main-btn.msg { background: #6f42c1; }
+    .main-btn.stats { background: #4F6BF5; }
+    .main-btn.count { background: #1C2033; color: #5E81FF; cursor: default; }
+    .main-btn.ads { background: #4F6BF5; }
+    .main-btn.private { background: #4F6BF5; }
+    .main-btn.public { background: #4F6BF5; color: #fff; }
+    .main-btn.msg { background: #4F6BF5; }
 
     /* لیست محصولات داخل پاپ آپ */
     .product-item {
-      background: #fff;
+      background: #0B0E1A;
       border-radius: 8px;
       padding: 12px;
       margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 12px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      border: 1px solid #ddd;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      border: 1px solid #2E344D;
+      color: #D1D5DB;
     }
-    .product-item img { width: 70px; height: 70px; border-radius: 6px; object-fit: cover; }
+    .product-item img { width: 70px; height: 70px; border-radius: 6px; object-fit: cover; border: 1px solid #2E344D; }
     .product-details { flex-grow: 1; text-align: right; }
-    .product-title { font-weight: bold; font-size: 0.95rem; }
-    .product-price { color: #28a745; font-size: 0.85rem; margin-top: 4px; }
+    .product-title { font-weight: bold; font-size: 0.95rem; color: #5E81FF; }
+    .product-price { color: #D1D5DB; font-size: 0.85rem; margin-top: 4px; }
     .actions { display: flex; gap: 8px; }
     .btn-sm {
       padding: 6px 10px;
-      border: none;
+      border: 1px solid #2E344D;
       border-radius: 4px;
       cursor: pointer;
       font-size: 0.8rem;
       color: #fff;
     }
-    .btn-edit { background: #ffc107; color: #000; }
+    .btn-edit { background: #4F6BF5; color: #fff; }
     .btn-del { background: #dc3545; }
 
     /* پاپ آپ‌ها */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(11, 14, 26, 0.8);
       display: none;
       justify-content: center;
       align-items: center;
@@ -122,15 +130,17 @@
       padding: 15px;
     }
     .modal {
-      background: #fff;
+      background: #1C2033;
+      border: 1px solid #2E344D;
       width: 100%;
       max-width: 450px;
       border-radius: 12px;
       padding: 20px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
       position: relative;
       max-height: 90vh;
       overflow-y: auto;
+      color: #D1D5DB;
     }
 
     /* پاپ آپ ۹۰ درصدی برای مدیریت آگهی‌ها */
@@ -141,22 +151,24 @@
       max-height: 90vh;
     }
 
-    .modal h3 { margin-bottom: 15px; text-align: center; color: #333; }
+    .modal h3 { margin-bottom: 15px; text-align: center; color: #5E81FF; }
     .modal input, .modal textarea {
       width: 100%;
       padding: 10px;
       margin-bottom: 10px;
-      border: 1px solid #ccc;
+      background: #0B0E1A;
+      border: 1px solid #2E344D;
       border-radius: 6px;
       font-size: 0.9rem;
+      color: #D1D5DB;
     }
-    .modal label { font-size: 0.8rem; color: #666; margin-bottom: 4px; display: block; }
+    .modal label { font-size: 0.8rem; color: #D1D5DB; margin-bottom: 4px; display: block; }
     .modal-btn {
       width: 100%;
       padding: 10px;
-      border: none;
+      border: 1px solid #2E344D;
       border-radius: 6px;
-      background: #007bff;
+      background: #4F6BF5;
       color: #fff;
       font-size: 1rem;
       cursor: pointer;
@@ -167,10 +179,11 @@
       top: 10px; left: 10px;
       border: none; background: none;
       font-size: 1.2rem; cursor: pointer;
+      color: #D1D5DB;
     }
 
     .list-item {
-      background: #f8f9fa;
+      background: #0B0E1A;
       padding: 10px;
       border-radius: 6px;
       margin-bottom: 8px;
@@ -178,24 +191,25 @@
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
-      border: 1px solid #e9ecef;
+      border: 1px solid #2E344D;
+      color: #D1D5DB;
     }
     
     .chat-box {
       max-height: 250px;
       overflow-y: auto;
-      border: 1px solid #ddd;
+      border: 1px solid #2E344D;
       padding: 10px;
       border-radius: 6px;
       margin-bottom: 10px;
-      background: #fdfdfd;
+      background: #0B0E1A;
       display: flex;
       flex-direction: column;
     }
     .msg { margin-bottom: 8px; padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; max-width: 80%; }
-    .msg.user { background: #e2e3e5; align-self: flex-start; }
-    .msg.admin { background: #d4edda; align-self: flex-end; text-align: right; }
-    .msg img { max-width: 100%; border-radius: 4px; margin-top: 5px; display: block; }
+    .msg.user { background: #2E344D; color: #D1D5DB; align-self: flex-start; }
+    .msg.admin { background: #4F6BF5; color: #fff; align-self: flex-end; text-align: right; }
+    .msg img { max-width: 100%; border-radius: 4px; margin-top: 5px; display: block; border: 1px solid #2E344D; }
   </style>
 </head>
 <body>
@@ -236,7 +250,7 @@
     <div class="modal">
       <button class="close-modal" onclick="closeModal('userStatsModal')">✕</button>
       <h3>آمار کاربران</h3>
-      <div id="userStatsContent" style="margin-bottom: 15px; font-weight: bold; color: #007bff;"></div>
+      <div id="userStatsContent" style="margin-bottom: 15px; font-weight: bold; color: #5E81FF;"></div>
       <div id="userStatsList">در حال بارگذاری...</div>
     </div>
   </div>
@@ -246,7 +260,7 @@
     <div class="modal modal-90">
       <button class="close-modal" onclick="closeModal('adsManagerModal')">✕</button>
       <h3>مدیریت آگهی‌ها</h3>
-      <button class="modal-btn" style="background:#28a745; margin-bottom:15px;" onclick="openAddProductModal()">+ افزودن محصول جدید</button>
+      <button class="modal-btn" style="background:#4F6BF5; margin-bottom:15px;" onclick="openAddProductModal()">+ افزودن محصول جدید</button>
       <div id="adminProductsList">در حال بارگذاری...</div>
     </div>
   </div>
@@ -409,7 +423,7 @@
       container.innerHTML = '';
 
       if (keys.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#777;">کاربری ثبت نشده است.</p>';
+        container.innerHTML = '<p style="text-align:center; color:#D1D5DB;">کاربری ثبت نشده است.</p>';
         return;
       }
 
@@ -422,7 +436,7 @@
           <div>
             <div><strong>نام:</strong> ${usr.name || 'ثبت نشده'}</div>
             <div><strong>نام کاربری:</strong> ${usr.username || u}</div>
-            <div style="font-size:0.85rem; color:#d9534f;"><strong>رمز عبور:</strong> ${usr.password || 'ندارد'}</div>
+            <div style="font-size:0.85rem; color:#dc3545;"><strong>رمز عبور:</strong> ${usr.password || 'ندارد'}</div>
           </div>
         `;
         container.appendChild(item);
@@ -445,7 +459,7 @@
       document.getElementById('mainAdsCount').innerText = keys.length;
 
       if (keys.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#777;">محصولی وجود ندارد.</p>';
+        container.innerHTML = '<p style="text-align:center; color:#D1D5DB;">محصولی وجود ندارد.</p>';
         return;
       }
 
@@ -587,7 +601,7 @@
           <div>
             <strong>${usr.name || 'بدون نام'}</strong> (${usr.username || u})
           </div>
-          <span style="font-size:0.8rem; color:#007bff;">انتخاب ›</span>
+          <span style="font-size:0.8rem; color:#5E81FF;">انتخاب ›</span>
         `;
         container.appendChild(item);
       });
@@ -619,7 +633,7 @@
 
       const usersWhoSentMsg = Object.keys(messages);
       if (usersWhoSentMsg.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#777;">هیچ پیامی دریافت نشده است.</p>';
+        container.innerHTML = '<p style="text-align:center; color:#D1D5DB;">هیچ پیامی دریافت نشده است.</p>';
         return;
       }
 
@@ -629,7 +643,7 @@
         item.onclick = () => openReplyModal(u);
         item.innerHTML = `
           <strong>گفتگو با ${u}</strong>
-          <span style="font-size:0.8rem; color:#28a745;">مشاهده و پاسخ ›</span>
+          <span style="font-size:0.8rem; color:#5E81FF;">مشاهده و پاسخ ›</span>
         `;
         container.appendChild(item);
       });
