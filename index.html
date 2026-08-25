@@ -222,17 +222,16 @@
     <p style="grid-column: span 2; text-align: center; color: #D1D5DB;">در حال بارگذاری محصولات...</p>
   </main>
 
-  <!-- پاپ آپ انتخاب ورود/ثبت نام -->
+  <!-- پاپ آپ انتخاب ورود/ثبت نام (ضربدر حذف شد) -->
   <div class="modal-overlay" id="authChoiceModal">
     <div class="modal">
-      <button class="close-modal" onclick="closeModal('authChoiceModal')">✕</button>
       <h3>ورود یا ثبت نام</h3>
       <button class="modal-btn" onclick="switchModal('authChoiceModal', 'loginModal')">دکمه ورود (با رمز عبور)</button>
       <button class="modal-btn secondary" onclick="switchModal('authChoiceModal', 'registerModal')">دکمه ثبت نام (اعضای جدید)</button>
     </div>
   </div>
 
-  <!-- پاپ آپ ثبت نام -->
+  <!-- پاپ آپ ثبت نام (با دکمه بازگشت) -->
   <div class="modal-overlay" id="registerModal">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('registerModal')">✕</button>
@@ -241,10 +240,11 @@
       <input type="text" id="regUser" placeholder="نام کاربری (حداقل ۵ حرف)">
       <input type="password" id="regPass" placeholder="رمز عبور (حداقل ۵ حرف)">
       <button class="modal-btn" onclick="submitRegister()">ثبت نام</button>
+      <button class="modal-btn secondary" onclick="switchModal('registerModal', 'authChoiceModal')">بازگشت</button>
     </div>
   </div>
 
-  <!-- پاپ آپ ورود -->
+  <!-- پاپ آپ ورود (با دکمه بازگشت) -->
   <div class="modal-overlay" id="loginModal">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('loginModal')">✕</button>
@@ -252,6 +252,7 @@
       <input type="text" id="loginUser" placeholder="نام کاربری">
       <input type="password" id="loginPass" placeholder="رمز عبور">
       <button class="modal-btn" onclick="submitLogin()">ورود</button>
+      <button class="modal-btn secondary" onclick="switchModal('loginModal', 'authChoiceModal')">بازگشت</button>
     </div>
   </div>
 
