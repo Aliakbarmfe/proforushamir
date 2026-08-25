@@ -6,7 +6,7 @@
   <title>پنل مدیریت</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
-    body { background-color: #f0f2f5; color: #333; padding-bottom: 80px; }
+    body { background-color: #f0f2f5; color: #333; padding-bottom: 20px; }
 
     /* هدر مدیریت */
     header {
@@ -21,7 +21,7 @@
       z-index: 100;
     }
     .btn-header {
-      background: #dc3545;
+      background: #17a2b8;
       color: white;
       border: none;
       padding: 8px 15px;
@@ -29,11 +29,56 @@
       cursor: pointer;
       font-weight: bold;
     }
-    .btn-header.info { background: #17a2b8; }
-    .btn-header.add { background: #28a745; font-size: 1.2rem; padding: 4px 12px; }
+    .header-stat-box {
+      background: #495057;
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      border: 1px solid #6c757d;
+    }
 
-    /* لیست محصولات */
-    .container { padding: 20px; max-width: 800px; margin: 0 auto; }
+    /* کانتینر اصلی و چیدمان بخش وسط و پایین */
+    .container { 
+      padding: 20px; 
+      max-width: 800px; 
+      margin: 0 auto; 
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .row-section {
+      display: flex;
+      gap: 15px;
+      width: 100%;
+    }
+
+    /* هم‌اندازه کردن دکمه‌های اصلی */
+    .main-btn {
+      flex: 1;
+      padding: 18px 10px;
+      border: none;
+      border-radius: 8px;
+      background: #007bff;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: background 0.2s, transform 0.1s;
+    }
+    .main-btn:active {
+      transform: scale(0.98);
+    }
+    .main-btn.ads { background: #28a745; }
+    .main-btn.private { background: #17a2b8; }
+    .main-btn.public { background: #ffc107; color: #000; }
+    .main-btn.msg { background: #6f42c1; }
+
+    /* لیست محصولات داخل پاپ آپ */
     .product-item {
       background: #fff;
       border-radius: 8px;
@@ -43,9 +88,10 @@
       align-items: center;
       gap: 12px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid #ddd;
     }
     .product-item img { width: 70px; height: 70px; border-radius: 6px; object-fit: cover; }
-    .product-details { flex-grow: 1; }
+    .product-details { flex-grow: 1; text-align: right; }
     .product-title { font-weight: bold; font-size: 0.95rem; }
     .product-price { color: #28a745; font-size: 0.85rem; margin-top: 4px; }
     .actions { display: flex; gap: 8px; }
@@ -59,31 +105,6 @@
     }
     .btn-edit { background: #ffc107; color: #000; }
     .btn-del { background: #dc3545; }
-
-    /* منوی شناور پایین */
-    .bottom-bar {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: #fff;
-      border-top: 1px solid #ccc;
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 5px;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-      z-index: 100;
-    }
-    .bottom-bar button {
-      flex: 1;
-      margin: 0 4px;
-      padding: 10px 5px;
-      border: none;
-      border-radius: 6px;
-      background: #007bff;
-      color: #fff;
-      font-size: 0.8rem;
-      cursor: pointer;
-      font-weight: bold;
-    }
 
     /* پاپ آپ‌ها */
     .modal-overlay {
@@ -107,6 +128,15 @@
       max-height: 90vh;
       overflow-y: auto;
     }
+
+    /* پاپ آپ ۹۰ درصدی برای مدیریت آگهی‌ها */
+    .modal-90 {
+      max-width: none;
+      width: 90vw;
+      height: 90vh;
+      max-height: 90vh;
+    }
+
     .modal h3 { margin-bottom: 15px; text-align: center; color: #333; }
     .modal input, .modal textarea {
       width: 100%;
@@ -148,17 +178,19 @@
     }
     
     .chat-box {
-      max-height: 200px;
+      max-height: 250px;
       overflow-y: auto;
       border: 1px solid #ddd;
       padding: 10px;
       border-radius: 6px;
       margin-bottom: 10px;
       background: #fdfdfd;
+      display: flex;
+      flex-direction: column;
     }
     .msg { margin-bottom: 8px; padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; max-width: 80%; }
     .msg.user { background: #e2e3e5; align-self: flex-start; }
-    .msg.admin { background: #d4edda; margin-right: auto; text-align: left; }
+    .msg.admin { background: #d4edda; align-self: flex-end; text-align: right; }
     .msg img { max-width: 100%; border-radius: 4px; margin-top: 5px; display: block; }
   </style>
 </head>
@@ -166,37 +198,54 @@
 
   <!-- هدر پنل مدیریت -->
   <header>
-    <button class="btn-header" onclick="logoutAdmin()">خروج</button>
-    <button class="btn-header info" onclick="openAdminInfoModal()">اطلاعات مدیر</button>
-    <button class="btn-header add" onclick="openAddProductModal()">+</button>
+    <!-- بالای سایت سمت راست -->
+    <button class="btn-header" onclick="openUserStatsModal()">آمار کاربران</button>
+    
+    <!-- بالای سایت سمت چپ -->
+    <div class="header-stat-box">
+      تعداد آگهی‌ها: <span id="headerAdsCount">0</span>
+    </div>
   </header>
 
-  <!-- لیست محصولات -->
+  <!-- کانتینر اصلی محتوای صفحه -->
   <div class="container">
-    <h3 style="margin-bottom: 15px;">مدیریت محصولات</h3>
-    <div id="adminProductsList">در حال بارگذاری...</div>
+    
+    <!-- وسط سایت: سمت راست (مدیریت آگهی)، سمت چپ (ارسال اعلان خصوصی) -->
+    <div class="row-section">
+      <button class="main-btn ads" onclick="openAdsManagerModal()">مدیریت آگهی</button>
+      <button class="main-btn private" onclick="openUsersModalForNotice()">ارسال اعلان خصوصی</button>
+    </div>
+
+    <!-- پایین سایت: سمت راست (ارسال اعلان عمومی)، سمت چپ (ارسال پیام به کاربر) -->
+    <div class="row-section">
+      <button class="main-btn public" onclick="openPublicNoticeModal()">ارسال اعلان عمومی</button>
+      <button class="main-btn msg" onclick="openUserMessagesModal()">ارسال پیام به کاربر</button>
+    </div>
+
   </div>
 
-  <!-- منوی شناور پایین -->
-  <div class="bottom-bar">
-    <button onclick="openPublicNoticeModal()">ارسال اعلان عمومی</button>
-    <button onclick="openMessagesModal()">پیام کاربران</button>
-    <button onclick="openUsersModal()">کاربران</button>
-  </div>
-
-  <!-- پاپ آپ تغییر اطلاعات مدیر -->
-  <div class="modal-overlay" id="adminInfoModal">
+  <!-- پاپ آپ آمار کاربران -->
+  <div class="modal-overlay" id="userStatsModal">
     <div class="modal">
-      <button class="close-modal" onclick="closeModal('adminInfoModal')">✕</button>
-      <h3>تغییر اطلاعات مدیر</h3>
-      <input type="text" id="newAdminUser" placeholder="نام کاربری جدید">
-      <input type="password" id="newAdminPass" placeholder="رمز عبور جدید">
-      <button class="modal-btn" onclick="saveAdminInfo()">ذخیره تغییرات</button>
+      <button class="close-modal" onclick="closeModal('userStatsModal')">✕</button>
+      <h3>آمار کاربران</h3>
+      <div id="userStatsContent" style="margin-bottom: 15px; font-weight: bold; color: #007bff;"></div>
+      <div id="userStatsList">در حال بارگذاری...</div>
+    </div>
+  </div>
+
+  <!-- پاپ آپ مدیریت آگهی (۹۰ درصد صفحه) -->
+  <div class="modal-overlay" id="adsManagerModal">
+    <div class="modal modal-90">
+      <button class="close-modal" onclick="closeModal('adsManagerModal')">✕</button>
+      <h3>مدیریت آگهی‌ها</h3>
+      <button class="modal-btn" style="background:#28a745; margin-bottom:15px;" onclick="openAddProductModal()">+ افزودن محصول جدید</button>
+      <div id="adminProductsList">در حال بارگذاری...</div>
     </div>
   </div>
 
   <!-- پاپ آپ افزودن/ویرایش محصول -->
-  <div class="modal-overlay" id="productModal">
+  <div class="modal-overlay" id="productModal" style="z-index: 1100;">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('productModal')">✕</button>
       <h3 id="productModalTitle">افزودن محصول</h3>
@@ -229,11 +278,11 @@
     </div>
   </div>
 
-  <!-- پاپ آپ لیست کاربران -->
+  <!-- پاپ آپ لیست کاربران (برای ارسال اعلان خصوصی) -->
   <div class="modal-overlay" id="usersModal">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('usersModal')">✕</button>
-      <h3>لیست کاربران</h3>
+      <h3>انتخاب کاربر جهت ارسال اعلان</h3>
       <div id="usersListContainer">در حال بارگذاری...</div>
     </div>
   </div>
@@ -248,7 +297,7 @@
     </div>
   </div>
 
-  <!-- پاپ آپ پیام‌های کاربران -->
+  <!-- پاپ آپ پیام‌های کاربران (ارسال پیام به کاربر) -->
   <div class="modal-overlay" id="userMessagesModal">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('userMessagesModal')">✕</button>
@@ -257,7 +306,7 @@
     </div>
   </div>
 
-  <!-- پاپ آپ پاسخ به پیام کاربر -->
+  <!-- پاپ آپ گفتگو و پاسخ به پیام کاربر -->
   <div class="modal-overlay" id="replyModal">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('replyModal')">✕</button>
@@ -316,33 +365,57 @@
     }
 
     window.onload = () => {
-      loadAdminProducts();
+      updateAdsCountHeader();
     };
 
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    function logoutAdmin() {
-      window.onbeforeunload = null;
-      sessionStorage.removeItem('adminAuthenticated');
-      window.location.href = 'index.html';
+    // بروزرسانی تعداد آگهی‌ها در هدر
+    async function updateAdsCountHeader() {
+      const products = await apiFirebase('products') || {};
+      const count = Object.keys(products).length;
+      document.getElementById('headerAdsCount').innerText = count;
     }
 
-    // اطلاعات مدیر
-    async function openAdminInfoModal() {
-      const info = await apiFirebase('adminInfo') || { username: 'admin', password: 'admin' };
-      document.getElementById('newAdminUser').value = info.username;
-      document.getElementById('newAdminPass').value = info.password;
-      openModal('adminInfoModal');
+    // آمار کاربران (بالای سایت سمت راست)
+    async function openUserStatsModal() {
+      openModal('userStatsModal');
+      const container = document.getElementById('userStatsList');
+      const statsContent = document.getElementById('userStatsContent');
+      container.innerHTML = 'در حال بارگذاری...';
+      statsContent.innerHTML = '';
+      
+      const users = await apiFirebase('users') || {};
+      const keys = Object.keys(users);
+      statsContent.innerText = `تعداد کل کاربران: ${keys.length} نفر`;
+      container.innerHTML = '';
+
+      if (keys.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#777;">کاربری ثبت نشده است.</p>';
+        return;
+      }
+
+      keys.forEach(u => {
+        const usr = users[u];
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.style.cursor = 'default';
+        item.innerHTML = `
+          <div>
+            <div><strong>نام:</strong> ${usr.name || 'ثبت نشده'}</div>
+            <div><strong>نام کاربری:</strong> ${usr.username || u}</div>
+            <div style="font-size:0.85rem; color:#d9534f;"><strong>رمز عبور:</strong> ${usr.password || 'ندارد'}</div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
     }
 
-    async function saveAdminInfo() {
-      const u = document.getElementById('newAdminUser').value.trim();
-      const p = document.getElementById('newAdminPass').value.trim();
-      if (!u || !p) return alert('اطلاعات را کامل وارد کنید');
-      await apiFirebase('adminInfo', 'PUT', { username: u, password: p });
-      alert('اطلاعات مدیر با موفقیت بروزرسانی شد');
-      closeModal('adminInfoModal');
+    // پاپ آپ مدیریت آگهی‌ها (۹۰٪ صفحه)
+    function openAdsManagerModal() {
+      openModal('adsManagerModal');
+      loadAdminProducts();
     }
 
     // مدیریت محصولات
@@ -351,6 +424,8 @@
       const products = await apiFirebase('products') || {};
       container.innerHTML = '';
       const keys = Object.keys(products);
+
+      document.getElementById('headerAdsCount').innerText = keys.length;
 
       if (keys.length === 0) {
         container.innerHTML = '<p style="text-align:center; color:#777;">محصولی وجود ندارد.</p>';
@@ -479,7 +554,7 @@
     }
 
     // کاربران و اعلان شخصی
-    async function openUsersModal() {
+    async function openUsersModalForNotice() {
       openModal('usersModal');
       const container = document.getElementById('usersListContainer');
       container.innerHTML = 'در حال بارگذاری...';
@@ -490,13 +565,12 @@
         const usr = users[u];
         const item = document.createElement('div');
         item.className = 'list-item';
-        item.onclick = () => openPrivateNoticeModal(usr.username);
+        item.onclick = () => openPrivateNoticeModal(usr.username || u);
         item.innerHTML = `
           <div>
-            <strong>${usr.name}</strong> (${usr.username})
-            <div style="font-size:0.75rem; color:#777;">رمز: ${usr.password}</div>
+            <strong>${usr.name || 'بدون نام'}</strong> (${usr.username || u})
           </div>
-          <span style="font-size:0.8rem; color:#007bff;">ارسال پیام ›</span>
+          <span style="font-size:0.8rem; color:#007bff;">انتخاب ›</span>
         `;
         container.appendChild(item);
       });
@@ -518,8 +592,8 @@
       alert('اعلان شخصی ارسال شد');
     }
 
-    // پیام‌های کاربران
-    async function openMessagesModal() {
+    // پیام‌های کاربران (ارسال پیام به کاربر)
+    async function openUserMessagesModal() {
       openModal('userMessagesModal');
       const container = document.getElementById('userMsgListContainer');
       container.innerHTML = 'در حال بارگذاری...';
