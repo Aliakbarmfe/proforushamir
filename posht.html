@@ -6,7 +6,30 @@
   <title>پشتیبانی و گفتگو</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
-    body { background-color: #f4f6f9; color: #333; height: 100vh; display: flex; flex-direction: column; }
+    
+    body { 
+      background-color: #eef2f5; 
+      color: #333; 
+      min-height: 100vh; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      padding: 15px; 
+    }
+
+    /* کارت و باکس اصلی پشتیبانی */
+    .chat-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 650px;
+      height: 85vh;
+      display: flex;
+      flex-direction: column;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
 
     /* هدر */
     header {
@@ -16,7 +39,6 @@
       display: flex;
       align-items: center;
       gap: 15px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     .back-btn {
       background: none;
@@ -30,14 +52,12 @@
     /* باکس گفتگو */
     .chat-container {
       flex: 1;
-      padding: 15px;
+      padding: 20px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      max-width: 800px;
-      width: 100%;
-      margin: 0 auto;
+      background: #f8f9fa;
     }
     .msg {
       max-width: 80%;
@@ -80,68 +100,93 @@
     /* فرم ارسال پیام */
     .chat-input-area {
       background: white;
-      padding: 12px 15px;
-      border-top: 1px solid #ddd;
+      padding: 15px;
+      border-top: 1px solid #eee;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      max-width: 800px;
-      width: 100%;
-      margin: 0 auto;
+      gap: 10px;
     }
-    .input-row { display: flex; gap: 8px; align-items: center; }
     .chat-input-area textarea {
-      flex: 1;
-      padding: 10px;
+      width: 100%;
+      padding: 12px;
       border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      resize: none;
-      height: 45px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      resize: vertical;
+      height: 90px; /* باکس بزرگ برای پیام دادن */
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input-area textarea:focus {
+      border-color: #007bff;
+    }
+    .input-actions { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      gap: 10px; 
     }
     .chat-input-area input[type="file"] { display: none; }
+    
+    /* دکمه انتخاب عکس جدید */
     .file-btn {
       background: #6c757d;
       color: white;
-      padding: 10px 12px;
+      padding: 8px 14px;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .file-btn:hover {
+      background: #5a6268;
     }
     .send-btn {
       background: #28a745;
       color: white;
       border: none;
-      padding: 10px 16px;
+      padding: 8px 20px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    .send-btn:hover {
+      background: #218838;
     }
     .preview-info { font-size: 0.75rem; color: #666; display: none; }
   </style>
 </head>
 <body>
 
-  <!-- هدر -->
-  <header>
-    <button class="back-btn" onclick="window.location.href='index.html'">➔</button>
-    <h2>پشتیبانی و گفتگو با مدیر</h2>
-  </header>
+  <!-- باکس اصلی چت -->
+  <div class="chat-card">
+    
+    <!-- هدر -->
+    <header>
+      <button class="back-btn" onclick="window.location.href='index.html'">➔</button>
+      <h2>پشتیبانی و گفتگو با مدیر</h2>
+    </header>
 
-  <!-- چت روم -->
-  <div class="chat-container" id="chatContainer">
-    <p style="text-align: center; color: #777;">در حال بارگذاری پیام‌ها...</p>
-  </div>
-
-  <!-- بخش ارسال -->
-  <div class="chat-input-area">
-    <div class="preview-info" id="filePreviewInfo">تصویر انتخاب شد</div>
-    <div class="input-row">
-      <label for="imgUpload" class="file-btn">📷</label>
-      <input type="file" id="imgUpload" accept="image/*" onchange="handleFileSelect()">
-      <textarea id="msgText" placeholder="پیام خود را بنویسید..."></textarea>
-      <button class="send-btn" id="sendBtn" onclick="sendMessage()">ارسال</button>
+    <!-- چت روم -->
+    <div class="chat-container" id="chatContainer">
+      <p style="text-align: center; color: #777;">در حال بارگذاری پیام‌ها...</p>
     </div>
+
+    <!-- بخش ارسال -->
+    <div class="chat-input-area">
+      <div class="preview-info" id="filePreviewInfo">تصویر انتخاب شد</div>
+      <textarea id="msgText" placeholder="پیام خود را بنویسید..."></textarea>
+      
+      <div class="input-actions">
+        <label for="imgUpload" class="file-btn">انتخاب عکس</label>
+        <input type="file" id="imgUpload" accept="image/*" onchange="handleFileSelect()">
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">ارسال</button>
+      </div>
+    </div>
+
   </div>
 
   <script>
