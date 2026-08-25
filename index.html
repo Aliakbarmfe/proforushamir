@@ -93,7 +93,6 @@
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -108,7 +107,19 @@
       border: 1px solid #2E344D;
     }
     .product-title { font-size: 0.95rem; font-weight: bold; margin: 8px 0 4px; color: #5E81FF; }
-    .product-price { font-size: 0.85rem; color: #D1D5DB; font-weight: bold; }
+    .product-price { font-size: 0.85rem; color: #D1D5DB; font-weight: bold; margin-bottom: 8px; }
+    .buy-btn {
+      width: 100%;
+      padding: 8px;
+      background: #4F6BF5;
+      color: white;
+      border: 1px solid #2E344D;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-top: auto;
+    }
 
     /* پاپ آپ‌ها */
     .modal-overlay {
@@ -222,7 +233,7 @@
     <p style="grid-column: span 2; text-align: center; color: #D1D5DB;">در حال بارگذاری محصولات...</p>
   </main>
 
-  <!-- پاپ آپ انتخاب ورود/ثبت نام (ضربدر حذف شد) -->
+  <!-- پاپ آپ انتخاب ورود/ثبت نام -->
   <div class="modal-overlay" id="authChoiceModal">
     <div class="modal">
       <h3>ورود یا ثبت نام</h3>
@@ -231,7 +242,7 @@
     </div>
   </div>
 
-  <!-- پاپ آپ ثبت نام (با دکمه بازگشت) -->
+  <!-- پاپ آپ ثبت نام -->
   <div class="modal-overlay" id="registerModal">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('registerModal')">✕</button>
@@ -244,7 +255,7 @@
     </div>
   </div>
 
-  <!-- پاپ آپ ورود (با دکمه بازگشت) -->
+  <!-- پاپ آپ ورود -->
   <div class="modal-overlay" id="loginModal">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('loginModal')">✕</button>
@@ -289,36 +300,26 @@
     </div>
   </div>
 
-  <!-- پاپ آپ جزئیات محصول -->
+  <!-- پاپ آپ جزئیات محصول و اطلاعات پرداخت -->
   <div class="modal-overlay" id="productDetailModal">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('productDetailModal')">✕</button>
       <h3 id="pDetailTitle"></h3>
       <div class="slider-container" id="pDetailSlider"></div>
       <p style="margin-bottom: 8px;"><strong>قیمت:</strong> <span id="pDetailPrice"></span></p>
-      <p style="margin-bottom: 15px; color: #D1D5DB;" id="pDetailDesc"></p>
-      <button class="modal-btn" onclick="openBuyModal()">خرید محصول</button>
-    </div>
-  </div>
-
-  <!-- پاپ آپ پرداخت و اطلاعات تماس -->
-  <div class="modal-overlay" id="buyModal">
-    <div class="modal">
-      <button class="close-modal" onclick="closeModal('buyModal')">✕</button>
-      <h3>اطلاعات پرداخت</h3>
+      <p style="margin-bottom: 12px; color: #D1D5DB;" id="pDetailDesc"></p>
+      <hr style="border-color: #2E344D; margin-bottom: 12px;">
       <p style="margin-bottom: 8px;"><strong>شماره کارت:</strong> <span id="payCardNum"></span></p>
       <p style="margin-bottom: 8px;"><strong>نام صاحب کارت:</strong> <span id="payCardName"></span></p>
       <p style="margin-bottom: 15px;"><strong>آیدی روبیکا:</strong> <span id="payRubika"></span></p>
-      <button class="modal-btn" onclick="goToSupportWithReceipt()">ارسال رسید از طریق سایت</button>
+      <button class="modal-btn" onclick="goToPoshtPage()">پرداخت کردم</button>
     </div>
   </div>
 
   <script>
-    // متغیرهای ذخیره‌سازی محلی
     let currentUser = JSON.parse(localStorage.getItem('user')) || null;
     let selectedProduct = null;
 
-    // توابع API واسطه
     async function apiFirebase(path, method = 'GET', data = null) {
       const options = {
         method,
@@ -329,7 +330,6 @@
       return res.json();
     }
 
-    // مقداردهی اولیه
     window.onload = () => {
       updateUserUI();
       loadProducts();
@@ -354,10 +354,8 @@
       }
     }
 
-    // پاپ آپ‌ها
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { 
-      // جلوگیری از بستن پنجره‌های ورود در صورت عدم وجود کاربر
       if (!currentUser && (id === 'authChoiceModal' || id === 'loginModal' || id === 'registerModal')) {
         return;
       }
@@ -368,7 +366,6 @@
       openModal(to); 
     }
 
-    // ثبت نام
     async function submitRegister() {
       const name = document.getElementById('regName').value.trim();
       const username = document.getElementById('regUser').value.trim();
@@ -392,7 +389,6 @@
       loadProducts();
     }
 
-    // ورود
     async function submitLogin() {
       const username = document.getElementById('loginUser').value.trim();
       const password = document.getElementById('loginPass').value.trim();
@@ -418,18 +414,16 @@
       loadProducts();
     }
 
-    // پشتیبانی و پیام رسانی
     function goToSupport() {
       if (!currentUser) return alert('لطفاً اول ثبت نام کنید.');
       window.location.href = 'posht.html';
     }
 
-    function goToSupportWithReceipt() {
+    function goToPoshtPage() {
       if (!currentUser) return alert('لطفاً اول ثبت نام کنید.');
-      window.location.href = 'posht.html?action=receipt';
+      window.location.href = 'posht.html';
     }
 
-    // اعلانات
     async function openNotices() {
       if (!currentUser) return alert('لطفاً اول ثبت نام کنید.');
       openModal('noticesModal');
@@ -441,11 +435,9 @@
 
       let html = '';
       
-      // عمومی
       Object.values(publicNotices).forEach(n => {
         html += `<div class="notice-item"><strong>عمومی:</strong> ${n.text}</div>`;
       });
-      // شخصی
       Object.values(privateNotices).forEach(n => {
         html += `<div class="notice-item" style="border-color:#5E81FF;"><strong>شخصی:</strong> ${n.text}</div>`;
       });
@@ -453,7 +445,6 @@
       container.innerHTML = html || '<p style="text-align:center; color:#D1D5DB;">اعلانی وجود ندارد.</p>';
     }
 
-    // ورود مدیر
     async function submitAdminLogin() {
       const u = document.getElementById('adminUser').value.trim();
       const p = document.getElementById('adminPass').value.trim();
@@ -467,11 +458,9 @@
       }
     }
 
-    // بارگذاری محصولات
     async function loadProducts() {
       const grid = document.getElementById('productsGrid');
       
-      // بررسی ورود کاربر قبل از دریافت آگهی‌ها
       if (!currentUser) {
         grid.innerHTML = '<p style="grid-column: span 2; text-align: center; color: #D1D5DB;">برای مشاهده آگهی‌ها، ابتدا وارد حساب کاربری خود شوید یا ثبت‌نام کنید.</p>';
         openModal('authChoiceModal');
@@ -494,11 +483,11 @@
         p.id = key;
         const card = document.createElement('div');
         card.className = 'product-card';
-        card.onclick = () => openProductDetail(p);
         card.innerHTML = `
           <img src="${p.mainImage}" alt="${p.title}">
           <div class="product-title">${p.title}</div>
           <div class="product-price">${p.price} تومان</div>
+          <button class="buy-btn" onclick='openProductDetail(${JSON.stringify(p)})'>خرید</button>
         `;
         grid.appendChild(card);
       });
@@ -509,6 +498,10 @@
       document.getElementById('pDetailTitle').innerText = p.title;
       document.getElementById('pDetailPrice').innerText = `${p.price} تومان`;
       document.getElementById('pDetailDesc').innerText = p.desc || 'توضیحاتی وجود ندارد.';
+      
+      document.getElementById('payCardNum').innerText = p.cardNumber || 'ثبت نشده';
+      document.getElementById('payCardName').innerText = p.cardName || 'ثبت نشده';
+      document.getElementById('payRubika').innerText = p.rubika || 'ثبت نشده';
 
       const slider = document.getElementById('pDetailSlider');
       slider.innerHTML = `<img src="${p.mainImage}">`;
@@ -520,15 +513,6 @@
       }
 
       openModal('productDetailModal');
-    }
-
-    function openBuyModal() {
-      if (!selectedProduct) return;
-      document.getElementById('productDetailModal').style.display = 'none';
-      document.getElementById('payCardNum').innerText = selectedProduct.cardNumber || 'ثبت نشده';
-      document.getElementById('payCardName').innerText = selectedProduct.cardName || 'ثبت نشده';
-      document.getElementById('payRubika').innerText = selectedProduct.rubika || 'ثبت نشده';
-      openModal('buyModal');
     }
   </script>
 </body>
