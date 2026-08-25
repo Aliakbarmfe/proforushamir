@@ -118,7 +118,7 @@
     .btn-edit { background: #4F6BF5; color: #fff; }
     .btn-del { background: #dc3545; }
 
-    /* پاپ آپ‌ها */
+    /* پاپ آپ‌ها (بزرگ و ۹۵ درصد اندازه صفحه) */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -127,28 +127,23 @@
       justify-content: center;
       align-items: center;
       z-index: 1000;
-      padding: 15px;
+      padding: 10px;
     }
     .modal {
       background: #1C2033;
       border: 1px solid #2E344D;
-      width: 100%;
-      max-width: 450px;
+      width: 95vw;
+      height: 95vh;
+      max-width: 95vw;
+      max-height: 95vh;
       border-radius: 12px;
       padding: 20px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.5);
       position: relative;
-      max-height: 90vh;
       overflow-y: auto;
       color: #D1D5DB;
-    }
-
-    /* پاپ آپ ۹۰ درصدی برای مدیریت آگهی‌ها */
-    .modal-90 {
-      max-width: none;
-      width: 90vw;
-      height: 90vh;
-      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
     }
 
     .modal h3 { margin-bottom: 15px; text-align: center; color: #5E81FF; }
@@ -196,7 +191,8 @@
     }
     
     .chat-box {
-      max-height: 250px;
+      flex-grow: 1;
+      min-height: 200px;
       overflow-y: auto;
       border: 1px solid #2E344D;
       padding: 10px;
@@ -210,6 +206,17 @@
     .msg.user { background: #2E344D; color: #D1D5DB; align-self: flex-start; }
     .msg.admin { background: #4F6BF5; color: #fff; align-self: flex-end; text-align: right; }
     .msg img { max-width: 100%; border-radius: 4px; margin-top: 5px; display: block; border: 1px solid #2E344D; }
+    
+    /* نشانگر پیام‌های جدید */
+    .unread-badge {
+      background: #dc3545;
+      color: #fff;
+      font-size: 0.8rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: bold;
+      margin-right: 8px;
+    }
   </style>
 </head>
 <body>
@@ -241,7 +248,7 @@
       <button class="main-btn public" onclick="openPublicNoticeModal()">پیام همگانی</button>
       
       <!-- 6. پیام‌های پشتیبانی -->
-      <button class="main-btn msg" onclick="openUserMessagesModal()">پیام های پشتیبانی</button>
+      <button class="main-btn msg" id="supportBtn" onclick="openUserMessagesModal()">پیام های پشتیبانی</button>
     </div>
   </div>
 
@@ -255,9 +262,9 @@
     </div>
   </div>
 
-  <!-- پاپ آپ مدیریت آگهی (۹۰ درصد صفحه) -->
+  <!-- پاپ آپ مدیریت آگهی -->
   <div class="modal-overlay" id="adsManagerModal">
-    <div class="modal modal-90">
+    <div class="modal">
       <button class="close-modal" onclick="closeModal('adsManagerModal')">✕</button>
       <h3>مدیریت آگهی‌ها</h3>
       <button class="modal-btn" style="background:#4F6BF5; margin-bottom:15px;" onclick="openAddProductModal()">+ افزودن محصول جدید</button>
@@ -397,10 +404,33 @@
 
     window.onload = () => {
       updateAdsCount();
+      checkNewSupportMessages();
     };
 
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // محاسبه و بروزرسانی تعداد پیام‌های پشتیبانی در دکمه اصلی
+    async function checkNewSupportMessages() {
+      const messages = await apiFirebase('messages') || {};
+      let totalUnread = 0;
+
+      Object.keys(messages).forEach(u => {
+        const userMsgs = messages[u] || {};
+        Object.values(userMsgs).forEach(m => {
+          if (m.sender !== 'admin' && !m.read) {
+            totalUnread++;
+          }
+        });
+      });
+
+      const supportBtn = document.getElementById('supportBtn');
+      if (totalUnread > 0) {
+        supportBtn.innerText = `پیام های پشتیبانی (${totalUnread} پیام جدید)`;
+      } else {
+        supportBtn.innerText = `پیام های پشتیبانی`;
+      }
+    }
 
     // بروزرسانی تعداد آگهی‌ها
     async function updateAdsCount() {
@@ -443,7 +473,7 @@
       });
     }
 
-    // پاپ آپ مدیریت آگهی‌ها (۹۰٪ صفحه)
+    // پاپ آپ مدیریت آگهی‌ها
     function openAdsManagerModal() {
       openModal('adsManagerModal');
       loadAdminProducts();
@@ -638,11 +668,23 @@
       }
 
       usersWhoSentMsg.forEach(u => {
+        const userMsgs = messages[u] || {};
+        let unreadCount = 0;
+
+        Object.values(userMsgs).forEach(m => {
+          if (m.sender !== 'admin' && !m.read) {
+            unreadCount++;
+          }
+        });
+
         const item = document.createElement('div');
         item.className = 'list-item';
         item.onclick = () => openReplyModal(u);
         item.innerHTML = `
-          <strong>گفتگو با ${u}</strong>
+          <div>
+            <strong>گفتگو با ${u}</strong>
+            ${unreadCount > 0 ? `<span class="unread-badge">${unreadCount} پیام جدید</span>` : ''}
+          </div>
           <span style="font-size:0.8rem; color:#5E81FF;">مشاهده و پاسخ ›</span>
         `;
         container.appendChild(item);
@@ -654,7 +696,29 @@
       document.getElementById('replyUserSpan').innerText = username;
       closeModal('userMessagesModal');
       openModal('replyModal');
+      
+      // پیام‌ها را خوانده شده علامت‌گذاری می‌کنیم
+      await markMessagesAsRead(username);
+      
       loadChat();
+    }
+
+    async function markMessagesAsRead(username) {
+      const msgs = await apiFirebase(`messages/${username}`) || {};
+      const updates = {};
+      let hasUnread = false;
+
+      Object.keys(msgs).forEach(msgKey => {
+        if (msgs[msgKey].sender !== 'admin' && !msgs[msgKey].read) {
+          updates[`messages/${username}/${msgKey}/read`] = true;
+          hasUnread = true;
+        }
+      });
+
+      if (hasUnread) {
+        await apiFirebase('', 'PATCH', updates);
+        checkNewSupportMessages();
+      }
     }
 
     async function loadChat() {
