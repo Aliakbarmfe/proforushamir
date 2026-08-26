@@ -67,7 +67,7 @@
       font-size: 0.75rem;
       font-weight: bold;
       border: 2px solid #1C2033;
-      display: none; /* در حالت عادی اگر صفر باشد مخفی می‌شود */
+      display: none;
     }
 
     /* دکمه پشتیبانی شناور در پایین سمت راست */
@@ -253,10 +253,8 @@
 </head>
 <body>
 
-  <!-- لایه آبی رنگ جهت پوشاندن کامل background سایت پیش از ورود -->
   <div id="bgMask" class="bg-overlay-mask"></div>
 
-  <!-- هدر سایت -->
   <header>
     <div class="header-right">
       <button class="dots-btn" onclick="openModal('adminAuthModal')">⋮</button>
@@ -269,32 +267,48 @@
         🔔
         <span class="notification-badge" id="noticeBadge">0</span>
       </button>
-      <button class="user-btn" id="userBtn" onclick="handleUserBtnClick()">ورود</button>
+      <button class="user-btn" id="userBtn" onclick="handleUserBtnClick()">ورود / ثبت نام</button>
     </div>
   </header>
 
-  <!-- دکمه پشتیبانی شناور (پایین سمت راست) -->
   <button class="floating-support-btn" onclick="goToSupport()">
     💬 پشتیبانی
   </button>
 
-  <!-- لیست محصولات -->
   <main class="products-grid" id="productsGrid">
     <p style="grid-column: span 2; text-align: center; color: #D1D5DB;">در حال بارگذاری محصولات...</p>
   </main>
 
-  <!-- پاپ آپ تک‌فرم ورود / ثبت‌نام -->
-  <div class="modal-overlay" id="unifiedAuthModal">
+  <div class="modal-overlay" id="authChoiceModal">
     <div class="modal">
-      <h3>ورود</h3>
-      <input type="text" id="authName" placeholder="نام (حداکثر ۶ حرف)" maxlength="6">
-      <input type="text" id="authUser" placeholder="نام کاربری (حداقل ۵ حرف)">
-      <input type="password" id="authPass" placeholder="رمز عبور (حداقل ۵ حرف)">
-      <button class="modal-btn" onclick="submitUnifiedAuth()">ورود</button>
+      <h3>خوش آمدید</h3>
+      <p style="text-align: center; margin-bottom: 15px; font-size: 0.9rem;">لطفا یکی از گزینه‌های زیر را انتخاب کنید:</p>
+      <button class="modal-btn" onclick="showLoginView()">ورود (با رمز عبور)</button>
+      <button class="modal-btn secondary" style="background:#4F6BF5; color:#fff;" onclick="showRegisterView()">ثبت نام (اعضای جدید)</button>
     </div>
   </div>
 
-  <!-- پاپ آپ مدیریت حساب کاربر -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <h3>ورود به حساب</h3>
+      <input type="text" id="loginUser" placeholder="نام کاربری">
+      <input type="password" id="loginPass" placeholder="رمز عبور">
+      <button class="modal-btn" onclick="submitLogin()">ورود</button>
+      <button class="modal-btn secondary" onclick="showAuthChoice()">بازگشت</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="registerModal">
+    <div class="modal">
+      <h3>ثبت نام حساب جدید</h3>
+      <input type="text" id="regName" placeholder="نام (حداکثر ۶ حرف)" maxlength="6">
+      <input type="text" id="regUser" placeholder="نام کاربری (حداقل ۵ حرف)">
+      <input type="password" id="regPass" placeholder="رمز عبور (حداقل ۵ حرف)">
+      <button class="modal-btn" onclick="submitRegister()">ثبت نام</button>
+      <button class="modal-btn secondary" onclick="showAuthChoice()">بازگشت</button>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="userAccountModal">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('userAccountModal')">✕</button>
@@ -305,7 +319,6 @@
     </div>
   </div>
 
-  <!-- پاپ آپ ورود مدیر -->
   <div class="modal-overlay" id="adminAuthModal">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('adminAuthModal')">✕</button>
@@ -316,7 +329,6 @@
     </div>
   </div>
 
-  <!-- پاپ آپ اعلان‌ها -->
   <div class="modal-overlay" id="noticesModal">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('noticesModal')">✕</button>
@@ -327,7 +339,6 @@
     </div>
   </div>
 
-  <!-- پاپ آپ جزئیات محصول و اطلاعات پرداخت -->
   <div class="modal-overlay" id="productDetailModal">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('productDetailModal')">✕</button>
@@ -372,7 +383,7 @@
         btn.innerText = currentUser.name || currentUser.username;
         mask.style.display = 'none'; // نمایش سایت
       } else {
-        btn.innerText = 'ورود';
+        btn.innerText = 'ورود / ثبت نام';
         mask.style.display = 'block'; // پوشش پس‌زمینه با رنگ آبی
       }
     }
@@ -383,16 +394,32 @@
         document.getElementById('accPassword').innerText = currentUser.password;
         openModal('userAccountModal');
       } else {
-        openModal('unifiedAuthModal');
+        showAuthChoice();
       }
     }
 
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { 
-      if (!currentUser && id === 'unifiedAuthModal') {
+      if (!currentUser && (id === 'authChoiceModal' || id === 'loginModal' || id === 'registerModal')) {
         return;
       }
       document.getElementById(id).style.display = 'none'; 
+    }
+
+    function showAuthChoice() {
+      document.getElementById('loginModal').style.display = 'none';
+      document.getElementById('registerModal').style.display = 'none';
+      openModal('authChoiceModal');
+    }
+
+    function showLoginView() {
+      document.getElementById('authChoiceModal').style.display = 'none';
+      openModal('loginModal');
+    }
+
+    function showRegisterView() {
+      document.getElementById('authChoiceModal').style.display = 'none';
+      openModal('registerModal');
     }
 
     async function checkUnreadNotices() {
@@ -403,7 +430,6 @@
       
       const totalNotices = Object.keys(publicNotices).length + Object.keys(privateNotices).length;
       
-      // تعداد اعلان‌های قبلاً خوانده‌شده از حافظه مرزی خوانده می‌شود
       const readNoticesCount = parseInt(localStorage.getItem(`readNotices_${currentUser.username}`) || '0');
       
       unreadCount = Math.max(0, totalNotices - readNoticesCount);
@@ -421,10 +447,37 @@
       }
     }
 
-    async function submitUnifiedAuth() {
-      const name = document.getElementById('authName').value.trim();
-      const username = document.getElementById('authUser').value.trim();
-      const password = document.getElementById('authPass').value.trim();
+    /* بررسی و انجام ورود */
+    async function submitLogin() {
+      const username = document.getElementById('loginUser').value.trim();
+      const password = document.getElementById('loginPass').value.trim();
+
+      if (!username) return alert('لطفاً نام کاربری را وارد کنید');
+      if (!password) return alert('لطفاً رمز عبور را وارد کنید');
+
+      const users = await apiFirebase('users') || {};
+
+      if (!users[username]) {
+        return alert('نام کاربری وجود ندارد');
+      }
+
+      if (users[username].password !== password) {
+        return alert('رمز عبور اشتباه است');
+      }
+
+      currentUser = users[username];
+      localStorage.setItem('user', JSON.stringify(currentUser));
+      updateUserUI();
+      document.getElementById('loginModal').style.display = 'none';
+      loadProducts();
+      checkUnreadNotices();
+    }
+
+    /* بررسی و انجام ثبت‌نام */
+    async function submitRegister() {
+      const name = document.getElementById('regName').value.trim();
+      const username = document.getElementById('regUser').value.trim();
+      const password = document.getElementById('regPass').value.trim();
 
       if (name.length > 6 || name.length === 0) return alert('نام باید حداکثر ۶ حرف باشد');
       if (username.length < 5) return alert('نام کاربری باید حداقل ۵ حرف باشد');
@@ -433,29 +486,19 @@
       const users = await apiFirebase('users') || {};
 
       if (users[username]) {
-        // نام کاربری وجود دارد -> برسی صحت رمز عبور
-        if (users[username].password !== password) {
-          return alert('رمز عبور اشتباه است');
-        }
-        currentUser = users[username];
-        localStorage.setItem('user', JSON.stringify(currentUser));
-        updateUserUI();
-        document.getElementById('unifiedAuthModal').style.display = 'none';
-        loadProducts();
-        checkUnreadNotices();
-      } else {
-        // نام کاربری وجود ندارد -> ثبت نام جدید
-        const userData = { name, username, password };
-        await apiFirebase(`users/${username}`, 'PUT', userData);
-
-        currentUser = userData;
-        localStorage.setItem('user', JSON.stringify(currentUser));
-        updateUserUI();
-        document.getElementById('unifiedAuthModal').style.display = 'none';
-        alert('ثبت نام موفقیت آمیز بود');
-        loadProducts();
-        checkUnreadNotices();
+        return alert('این نام کاربری قبلاً انتخاب شده است، لطفاً نام کاربری دیگری انتخاب کنید');
       }
+
+      const userData = { name, username, password };
+      await apiFirebase(`users/${username}`, 'PUT', userData);
+
+      currentUser = userData;
+      localStorage.setItem('user', JSON.stringify(currentUser));
+      updateUserUI();
+      document.getElementById('registerModal').style.display = 'none';
+      alert('ثبت نام با موفقیت انجام شد');
+      loadProducts();
+      checkUnreadNotices();
     }
 
     function logoutUser() {
@@ -500,7 +543,6 @@
 
       container.innerHTML = html || '<p style="text-align:center; color:#D1D5DB;">اعلانی وجود ندارد.</p>';
 
-      // صفر کردن تعداد پیام‌های خوانده‌نشده هنگام مشاهده اعلان‌ها
       const totalNotices = pubList.length + privList.length;
       localStorage.setItem(`readNotices_${currentUser.username}`, totalNotices);
       unreadCount = 0;
@@ -525,7 +567,7 @@
       
       if (!currentUser) {
         grid.innerHTML = '<p style="grid-column: span 2; text-align: center; color: #D1D5DB;">برای مشاهده آگهی‌ها، ابتدا وارد حساب کاربری خود شوید یا ثبت‌نام کنید.</p>';
-        openModal('unifiedAuthModal');
+        showAuthChoice();
         return;
       }
 
