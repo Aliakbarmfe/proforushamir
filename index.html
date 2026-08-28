@@ -348,8 +348,7 @@
       <p style="margin-bottom: 12px; color: #D1D5DB;" id="pDetailDesc"></p>
       <hr style="border-color: #2E344D; margin-bottom: 12px;">
       <p style="margin-bottom: 8px;"><strong>شماره کارت:</strong> <span id="payCardNum"></span></p>
-      <p style="margin-bottom: 8px;"><strong>نام صاحب کارت:</strong> <span id="payCardName"></span></p>
-      <p style="margin-bottom: 15px;"><strong>آیدی روبیکا:</strong> <span id="payRubika"></span></p>
+      <p style="margin-bottom: 15px;"><strong>نام صاحب کارت:</strong> <span id="payCardName"></span></p>
       <button class="modal-btn" onclick="goToPoshtPage()">پرداخت کردم</button>
     </div>
   </div>
@@ -605,7 +604,6 @@
       
       document.getElementById('payCardNum').innerText = p.cardNumber || 'ثبت نشده';
       document.getElementById('payCardName').innerText = p.cardName || 'ثبت نشده';
-      document.getElementById('payRubika').innerText = p.rubika || 'ثبت نشده';
 
       const slider = document.getElementById('pDetailSlider');
       slider.innerHTML = `<img src="${p.mainImage}">`;
